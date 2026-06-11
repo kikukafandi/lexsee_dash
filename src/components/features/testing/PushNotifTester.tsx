@@ -12,9 +12,9 @@ export default function PushNotifTester() {
   const send = async () => {
     setStatus("Sending...");
     try {
-      await apiFetch("/notifications/test", {
+      await apiFetch("/api/notifications/test", {
         method: "POST",
-        body: JSON.stringify({ title, body, token }),
+        body: JSON.stringify({ title, body, fcmToken: token }),
       });
       setStatus("Sent.");
     } catch (err: any) {

@@ -1,39 +1,60 @@
-import { getToken } from "./auth";
+// src/lib/api.ts
+// Central API fetch utility for the Lexsee Admin Dashboard.
+// All requests go through Next.js rewrites (proxy), so no base URL is needed.
+// The proxy is configured in next.config.ts: /api/* → NestJS backend.
 
-type ApiFetchOptions = RequestInit & { auth?: boolean };
+const TOKEN_KEY = "lexsee_admin_token";
 
-export async function apiFetch<T = unknown>(
-    path: string,
-    options: ApiFetchOptions = {},
-) {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-    const url = path.startsWith("http") ? path : `${baseUrl}${path}`;
-    const headers = new Headers(options.headers || {});
+/**
+ * A generic fetch wrapper that:
+ * 1. Automatically attaches the JWT token from localStorage
+ * 2. Sets Content-Type: application/json
+ * 3. Throws a descriptive error if the response is not OK
+ *
+ * @param endpoint - The API path, e.g. "/api/legal/admin/stats"
+ * @param options  - Standard fetch options (method, body, etc.)
+ * @returns Parsed JSON response typed as T
+ */
+export async function apiFetch<T>(
+    endpoint: string,
+    options: RequestInit & { timeoutMs?: number } = {}
+): Promise<T> {
+    const { timeoutMs = 10_000, ...fetchOptions } = options;
 
-    if (options.body && !headers.has("Content-Type")) {
-        headers.set("Content-Type", "application/json");
+    // Read the JWT from localStorage (only available in the browser)
+    const token =
+        typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null;
+
+    const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+        ...(fetchOptions.headers as Record<string, string>),
+    };
+
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
     }
 
-    if (options.auth !== false) {
-        const token = getToken();
-        if (token) {
-            headers.set("Authorization", `Bearer ${token}`);
-        }
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
+    let response: Response;
+    try {
+      response = await fetch(endpoint, {
+        ...fetchOptions,
+        headers,
+        signal: controller.signal,
+      });
+    } finally {
+      clearTimeout(timer);
     }
 
-    const res = await fetch(url, { ...options, headers });
-    const contentType = res.headers.get("content-type") || "";
-
-    let data: unknown = null;
-    if (contentType.includes("application/json")) {
-        data = await res.json().catch(() => null);
-    } else {
-        data = await res.text().catch(() => null);
+    if (!response.ok) {
+        // Try to extract a meaningful error message from the response body
+        const errorBody = await response.json().catch(() => ({}));
+        const message =
+            errorBody.message ?? `Request failed with status ${response.status}`;
+        throw new Error(message);
     }
 
-    if (!res.ok) {
-        throw { status: res.status, data };
-    }
-
-    return data as T;
+    return response.json() as Promise<T>;
 }

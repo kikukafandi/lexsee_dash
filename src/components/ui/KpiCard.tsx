@@ -1,4 +1,4 @@
-import Sparkline from "./Sparkline";
+import { Sparkline } from "./Sparkline";
 
 export default function KpiCard({
   label,

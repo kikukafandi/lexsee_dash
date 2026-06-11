@@ -1,33 +1,37 @@
-import DataTable from "@/components/ui/DataTable";
-import Badge from "@/components/ui/Badge";
-import type { DocumentItem } from "@/types";
+import { DataTable } from "@/components/ui/DataTable";
+import { Badge } from "@/components/ui/Badge";
+import type { LegalDocument } from "@/types";
 
 export default function DocumentTable({
   data,
   onDelete,
 }: {
-  data: DocumentItem[];
+  data: LegalDocument[];
   onDelete: (id: string) => void;
 }) {
   return (
     <DataTable
       data={data}
       columns={[
-        { key: "title", label: "Title" },
-        { key: "type", label: "Type" },
-        { key: "chunks", label: "Chunks" },
+        { accessor: "title", header: "Title" },
+        { accessor: "type", header: "Type" },
         {
-          key: "status",
-          label: "Status",
-          render: (row) => <Badge label={row.status || "-"} />,
+          accessor: "_count",
+          header: "Chunks",
+          render: (row: LegalDocument) => <span>{(row as unknown as { _count?: { chunks?: number } })._count?.chunks ?? 0}</span>,
         },
-        { key: "createdAt", label: "Date" },
         {
-          key: "id",
-          label: "Actions",
-          render: (row) => (
+          accessor: "isActive",
+          header: "Status",
+          render: (row: LegalDocument) => <Badge>{(row as unknown as { isActive?: boolean }).isActive ? "Active" : "Inactive"}</Badge>,
+        },
+        { accessor: "createdAt", header: "Date" },
+        {
+          accessor: "id",
+          header: "Actions",
+          render: (row: LegalDocument) => (
             <button
-              className="text-error text-xs"
+              className="text-danger text-xs"
               onClick={() => row.id && onDelete(row.id)}
             >
               Delete
@@ -35,7 +39,7 @@ export default function DocumentTable({
           ),
         },
       ]}
-      emptyText="Belum ada dokumen di knowledge base."
+      emptyMessage="Belum ada dokumen di knowledge base."
     />
   );
 }

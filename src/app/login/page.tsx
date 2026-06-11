@@ -1,127 +1,162 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { apiFetch } from "@/lib/api";
-import { getProfile, getToken, removeToken, setToken } from "@/lib/auth";
-import { useI18n } from "@/lib/i18n";
+// Login page — entry point for the Admin Console.
+// Only users with role ADMIN can proceed past login.
+// On mount: if a token already exists, skip login and go to /overview.
+
+import { useState, useEffect } from "react";
+import { AlertTriangle } from "lucide-react";
+
+import { useRouter } from "next/navigation";
+import { login, getToken, getProfile } from "@/lib/auth";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [email, setEmail] = useState("");
+
+  const [email, setEmail] = useState("admin@lexsee.id");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const { lang, setLang, t } = useI18n();
+  const [accessDenied, setAccessDenied] = useState(false);
 
   useEffect(() => {
+    // Read URL params manually — avoids needing useSearchParams() + Suspense
+    const params = new URLSearchParams(window.location.search);
+    setAccessDenied(params.get("error") === "access-denied");
+
+    // If already logged in, go straight to the dashboard
     if (getToken()) {
       router.replace("/overview");
     }
   }, [router]);
 
-  useEffect(() => {
-    const err = searchParams.get("error");
-    if (err === "access") {
-      setError("Access denied. Admin role required.");
-    }
-  }, [searchParams]);
-
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
+    e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const data = await apiFetch<{ access_token?: string; token?: string }>(
-        "/auth/login",
-        {
-          method: "POST",
-          body: JSON.stringify({ email, password }),
-          auth: false,
-        },
-      );
+      // login() calls POST /api/auth/login and saves the JWT to localStorage
+      await login(email, password);
 
-      const token = data.access_token || data.token || "";
-      if (!token) {
-        throw new Error("Token tidak ditemukan dari server.");
-      }
-
-      setToken(token);
+      // Fetch the full profile to verify the ADMIN role
       const profile = await getProfile();
-      if (profile?.role !== "ADMIN") {
-        removeToken();
-        setError("Access denied. Admin role required.");
+
+      if (profile.role !== "ADMIN") {
+        // Clear the token — non-admin users cannot access this dashboard
+        import("@/lib/auth").then(({ removeToken }) => removeToken());
+        setError("Akses ditolak. Hanya Admin yang diizinkan masuk ke Admin Console.");
+        setLoading(false);
         return;
       }
 
-      router.replace("/overview");
-    } catch (err: any) {
-      const message = err?.data?.message || err?.message || "Login gagal";
+      // All good — go to the dashboard
+      router.push("/overview");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Login gagal. Periksa email dan password.";
       setError(message);
-      removeToken();
     } finally {
       setLoading(false);
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg px-4">
-      <div className="lux-card w-full max-w-md p-8">
-        <div className="mb-6 text-center">
-          <div className="text-gold text-sm tracking-[0.3em]">LEXSEE</div>
-          <h1 className="mt-2 text-2xl text-textHigh">{t("loginTitle")}</h1>
-          <p className="mt-2 text-sm text-textMed">{t("loginSubtitle")}</p>
-        </div>
-        <div className="mb-6 flex justify-center">
-          <button
-            className="rounded-lg border border-dividerGold bg-white px-3 py-1 text-xs text-textMed"
-            onClick={() => setLang(lang === "id" ? "en" : "id")}
-          >
-            {lang.toUpperCase()}
-          </button>
-        </div>
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label className="text-xs uppercase tracking-widest text-textLow">
-              {t("email")}
-            </label>
-            <input
-              className="mt-2 w-full rounded-lg border border-borderGold bg-surface2 px-3 py-2 text-textHigh focus:border-gold focus:outline-none"
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="admin@lexsee.id"
-              required
-            />
+    <div className="min-h-screen bg-bg flex items-center justify-center p-4">
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-gold/5 rounded-full blur-3xl" />
+      </div>
+
+      <div className="relative w-full max-w-md">
+        {/* ── Brand header ─────────────────────────────────────────── */}
+        <div className="text-center mb-8">
+          {/* Gold "L" logo */}
+          <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-gold to-gold-dim flex items-center justify-center mx-auto mb-4 shadow-lg shadow-gold/20">
+            <span className="text-maroon-deep font-bold text-2xl font-serif">L</span>
           </div>
-          <div>
-            <label className="text-xs uppercase tracking-widest text-textLow">
-              {t("password")}
-            </label>
-            <input
-              className="mt-2 w-full rounded-lg border border-borderGold bg-surface2 px-3 py-2 text-textHigh focus:border-gold focus:outline-none"
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder="••••••••"
-              required
-            />
-          </div>
-          {error && (
-            <div className="rounded-lg border border-error/40 bg-error/10 px-3 py-2 text-sm text-error">
-              {error}
+          <h1 className="text-3xl font-serif text-gold tracking-wide">LEXSEE</h1>
+          <p className="text-text-low text-xs tracking-widest uppercase mt-1">
+            Admin Console
+          </p>
+        </div>
+
+        {/* ── Login card ───────────────────────────────────────────── */}
+        <div className="bg-surface-1 border border-gold/25 rounded-2xl p-8 shadow-2xl shadow-black/50">
+          <h2 className="text-text-high font-serif text-xl mb-1">
+            Selamat datang kembali
+          </h2>
+          <p className="text-text-low text-sm mb-6">
+            Masuk ke panel administrasi Lexsee
+          </p>
+
+          {/* Access denied notice (when redirected from dashboard) */}
+          {accessDenied && (
+            <div className="mb-4 p-3 rounded-lg bg-danger/10 border border-danger/25 text-danger text-sm">
+              <AlertTriangle size={16} className="inline shrink-0" /> Sesi berakhir atau akses tidak diizinkan. Silakan masuk kembali.
             </div>
           )}
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-gold px-4 py-2 text-sm font-semibold text-white transition hover:bg-goldLight disabled:opacity-60"
-          >
-            {loading ? t("processing") : t("login")}
-          </button>
-        </form>
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Email field */}
+            <div>
+              <label className="block text-text-med text-xs font-semibold uppercase tracking-wider mb-1.5">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full bg-surface-2 border border-gold/25 rounded-lg px-4 py-2.5 text-text-high text-sm placeholder-text-low focus:outline-none focus:border-gold/60 focus:bg-surface-2 transition-colors"
+                placeholder="admin@lexsee.id"
+              />
+            </div>
+
+            {/* Password field */}
+            <div>
+              <label className="block text-text-med text-xs font-semibold uppercase tracking-wider mb-1.5">
+                Password
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full bg-surface-2 border border-gold/25 rounded-lg px-4 py-2.5 text-text-high text-sm placeholder-text-low focus:outline-none focus:border-gold/60 transition-colors"
+                placeholder="••••••••"
+              />
+            </div>
+
+            {/* Error message */}
+            {error && (
+              <div className="p-3 rounded-lg bg-danger/10 border border-danger/25 text-danger text-sm">
+                {error}
+              </div>
+            )}
+
+            {/* Submit button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 rounded-lg bg-gold text-maroon-deep font-bold text-sm hover:bg-gold-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+            >
+              {loading ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  <span>Memverifikasi...</span>
+                </>
+              ) : (
+                "Masuk ke Dashboard"
+              )}
+            </button>
+          </form>
+
+          {/* Default credentials hint for development */}
+          <p className="mt-5 text-center text-text-low text-xs border-t border-gold/10 pt-4">
+            Dev credentials: admin@lexsee.id / Admin@123
+          </p>
+        </div>
       </div>
     </div>
   );

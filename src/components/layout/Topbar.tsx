@@ -1,50 +1,83 @@
 "use client";
 
-import type { Profile } from "@/lib/auth";
-import { useI18n } from "@/lib/i18n";
+// Topbar.tsx — Sticky top navigation bar.
+// Shows the current page breadcrumb, admin user info, and logout button.
 
-export default function Topbar({ profile }: { profile: Profile | null }) {
-  const { lang, setLang, t } = useI18n();
+import { usePathname } from "next/navigation";
+import type { User } from "@/types";
+
+type TopbarProps = {
+  user: User | null;
+  onLogout: () => void;
+};
+
+// Maps URL paths to display names for the breadcrumb
+const PAGE_NAMES: Record<string, string> = {
+  "/overview": "Overview",
+  "/users": "Users",
+  "/membership": "Membership Plans",
+  "/orders": "Orders",
+  "/payments": "Payments",
+  "/legal-catalog": "Legal Catalog",
+  "/knowledge-base": "Knowledge Base",
+  "/testing": "Testing Suite",
+};
+
+export function Topbar({ user, onLogout }: TopbarProps) {
+  const pathname = usePathname();
+  const pageName = PAGE_NAMES[pathname] ?? "Dashboard";
+
+  // Get initials from user's name for the avatar
+  const initials = user?.name
+    ? user.name
+        .split(" ")
+        .slice(0, 2)
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+    : "A";
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-dividerGold bg-surface1 px-8">
-      <div className="flex items-center gap-4 text-sm text-textMed">
-        <span>{t("workspace")}</span>
-        <span className="text-textLow">›</span>
-        <span className="text-textHigh">{t("overview")}</span>
+    <header className="h-16 shrink-0 bg-surface-1 border-b border-gold/15 flex items-center px-6 gap-4">
+      {/* ── Breadcrumb ───────────────────────────────────────────────── */}
+      <div className="flex items-center gap-2 text-sm">
+        <span className="text-text-low">Workspace</span>
+        <span className="text-text-low">›</span>
+        <span className="text-text-high font-medium">{pageName}</span>
       </div>
+
+      {/* ── Spacer ───────────────────────────────────────────────────── */}
+      <div className="flex-1" />
+
+      {/* ── User info + Logout ───────────────────────────────────────── */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 rounded-lg border border-dividerGold bg-surface2 px-3 py-2 text-sm text-textMed">
-          <span>🔍</span>
-          <input
-            className="w-48 bg-transparent text-textHigh placeholder:text-textLow focus:outline-none"
-            placeholder={t("searchPlaceholder")}
-          />
-          <span className="rounded bg-white px-1 text-[10px] text-textLow">⌘K</span>
+        {user && (
+          <div className="text-right hidden sm:block">
+            <p className="text-text-high text-sm font-medium leading-none">
+              {user.name}
+            </p>
+            <p className="text-text-low text-xs mt-0.5">{user.email}</p>
+          </div>
+        )}
+
+        {/* Avatar circle with initials */}
+        <div className="w-9 h-9 rounded-full bg-linear-to-br from-gold to-gold-dim flex items-center justify-center text-maroon-deep font-bold text-sm font-serif shrink-0">
+          {initials}
         </div>
-        <div className="rounded-lg border border-dividerGold bg-surface2 px-3 py-2 text-sm text-textMed">
-          {t("dateRange")}
-        </div>
-        <button className="rounded-lg border border-dividerGold bg-white px-3 py-2 text-sm text-textHigh">
-          {t("export")}
-        </button>
-        <button className="rounded-lg bg-gold px-3 py-2 text-sm font-semibold text-white">
-          + {t("newMatter")}
-        </button>
+
+        {/* Admin role badge */}
+        <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-gold/15 text-gold border border-gold/30">
+          Admin
+        </span>
+
+        {/* Logout button */}
         <button
-          className="rounded-lg border border-dividerGold bg-white px-2 py-2 text-xs text-textMed"
-          onClick={() => setLang(lang === "id" ? "en" : "id")}
+          onClick={onLogout}
+          className="text-text-low hover:text-danger transition-colors text-xs px-3 py-1.5 rounded border border-gold/20 hover:border-danger/40 ml-1"
+          title="Logout"
         >
-          {lang.toUpperCase()}
+          Keluar
         </button>
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-surface2 flex items-center justify-center text-xs">
-            {profile?.name?.[0] || "A"}
-          </div>
-          <div className="text-sm text-textHigh">
-            {profile?.name || profile?.email || "Admin"}
-          </div>
-        </div>
       </div>
     </header>
   );

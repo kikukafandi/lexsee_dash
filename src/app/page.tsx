@@ -1,20 +1,25 @@
 "use client";
 
+// Root page — redirects to /overview if logged in, otherwise to /login.
+// This runs immediately on app load to send the user to the right page.
+
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { getToken } from "@/lib/auth";
+import { PageLoader } from "@/components/ui/LoadingSpinner";
 
-export default function Home() {
+export default function RootPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const token = getToken();
-    router.replace(token ? "/overview" : "/login");
+    // Check if a JWT token exists in localStorage
+    if (getToken()) {
+      router.replace("/overview");
+    } else {
+      router.replace("/login");
+    }
   }, [router]);
 
-  return (
-    <div className="flex flex-1 items-center justify-center text-textMed">
-      Redirecting...
-    </div>
-  );
+  // Show a loader while the redirect happens
+  return <PageLoader />;
 }

@@ -1,62 +1,233 @@
-export type AdminStats = {
-    documents?: { active?: number };
-    sessions?: number;
-    chunks?: number;
-    feedback?: { helpful?: number; notHelpful?: number };
+// src/types/index.ts
+// TypeScript types matching the Lexsee NestJS backend Prisma models.
+// Keep in sync with legal-backend/prisma/schema.prisma.
+
+// ─── Enums ─────────────────────────────────────────────────────────────────
+
+export type Role = "USER" | "PREMIUM" | "ADMIN";
+export type DocType =
+  | "UU"
+  | "PERPU"
+  | "PP"
+  | "PERPRES"
+  | "PERMEN"
+  | "KEPRES"
+  | "KEPMENKO"
+  | "KEPPRES"
+  | "PUTUSAN"
+  | "JURNAL"
+  | "LAINNYA";
+export type PaymentStatus = "PENDING" | "SUCCESS" | "FAILED";
+export type PaymentType = "MEMBERSHIP" | "BOOK";
+export type OrderStatus =
+  | "PENDING"
+  | "PAID"
+  | "PROCESSING"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "CANCELLED";
+export type MessageRole = "USER" | "ASSISTANT";
+export type PlanDuration = "MONTHLY" | "YEARLY";
+
+// ─── Core Models ───────────────────────────────────────────────────────────
+
+export type User = {
+  id: string;
+  email: string;
+  name: string;
+  bio?: string;
+  phone?: string;
+  photoUrl?: string;
+  address?: string;
+  cityId?: string;
+  role: Role;
+  interests: string[];
+  createdAt: string;
+  updatedAt: string;
 };
 
-export type PeraturanItem = {
-    id?: string;
-    judul?: string;
-    jenis?: string;
-    nomor?: string;
-    tahun?: number;
-    pdfUrl?: string;
+export type Peraturan = {
+  id: string;
+  idperaturan: string;
+  judul: string;
+  jenis: string;
+  jenisCode: string;
+  nomor?: string;
+  tahun?: string;
+  pdfPath?: string;
+  createdAt: string;
 };
 
-export type PaymentHistoryItem = {
-    id?: string;
-    amount?: number;
-    status?: string;
-    createdAt?: string;
+export type LegalDocument = {
+  id: string;
+  title: string;
+  type: DocType;
+  sourceUrl?: string;
+  publishedAt?: string;
+  uploadedBy?: string;
+  isActive: boolean;
+  createdAt: string;
+  _count?: { chunks: number };
 };
 
-export type MembershipTier = {
-    id?: string;
-    name?: string;
-    price?: number;
-    benefits?: string[];
+export type Payment = {
+  id: string;
+  userId: string;
+  amount: string;
+  status: PaymentStatus;
+  type: PaymentType;
+  midtransId?: string;
+  orderId?: string;
+  itemDetails?: unknown;
+  createdAt: string;
 };
 
 export type OrderItem = {
-    id?: string;
-    status?: string;
-    createdAt?: string;
-    items?: Array<{ title?: string; qty?: number }>;
+  id: string;
+  orderId: string;
+  bookId: string;
+  quantity: number;
+  price: string;
+  book?: Book;
 };
 
-export type BookItem = {
-    id?: string;
-    title?: string;
-    stock?: number;
-    price?: number;
+export type Order = {
+  id: string;
+  userId: string;
+  status: OrderStatus;
+  totalAmount: string;
+  shippingCost: string;
+  courierName?: string;
+  courierService?: string;
+  recipientName: string;
+  phone: string;
+  address: string;
+  cityId: string;
+  postalCode?: string;
+  createdAt: string;
+  updatedAt: string;
+  items?: OrderItem[];
 };
 
-export type DocumentItem = {
-    id?: string;
-    title?: string;
-    type?: string;
-    chunks?: number;
-    status?: string;
-    createdAt?: string;
+export type Book = {
+  id: string;
+  title: string;
+  author?: string;
+  price: string;
+  weight: number;
+  stock: number;
+  description?: string;
+  coverUrl?: string;
+  isbn?: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
+export type MembershipPlan = {
+  id: string;
+  name: string;
+  description?: string;
+  duration: PlanDuration;
+  price: string;
+  originalPrice?: string;
+  isPopular: boolean;
+  isActive: boolean;
+  features?: unknown;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ChatSession = {
+  id: string;
+  userId?: string;
+  title?: string;
+  createdAt: string;
+  updatedAt: string;
+  messages?: ChatMessage[];
+};
+
+export type ChatMessage = {
+  id: string;
+  sessionId: string;
+  role: MessageRole;
+  content: string;
+  sources?: unknown;
+  createdAt: string;
+};
+
+// ─── API Response Shapes ───────────────────────────────────────────────────
+
+/** Shape returned by GET /api/legal/admin/stats */
+export type KbStats = {
+  documents: { active: number; total: number };
+  chunks: number;
+  sessions: number;
+  feedback: { helpful: number; notHelpful: number };
+};
+
+/** Shape returned by GET /api/legal/peraturan */
+export type PeraturanListResponse = {
+  data: Peraturan[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
+};
+
+/** Shape returned by GET /api/legal/admin/documents */
+export type DocumentListResponse = {
+  data: LegalDocument[];
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    totalPages: number;
+  };
+};
+
+/** Shape returned by POST /api/auth/login */
+export type LoginResponse = {
+  message: string;
+  user: User;
+  token: string;
+  access_token?: string;
+};
+
+/** Shape returned by POST /api/legal/chat */
+export type ChatResponse = {
+  answer: string;
+  sources: Array<{ title: string; excerpt: string; sourceUrl?: string; relevanceScore: number; publishedAt?: string }>;
+  messageId?: string;
+  retrievedDocs: number;
+  sessionId?: string;
+};
+
+/** Membership tier from GET /api/payment/tiers */
+export type MembershipTier = {
+  tier: string;
+  label: string;
+  amount: number;
+  durationDays: number;
+};
+
+/** Single user entry from GET /api/admin/users */
 export type AdminUser = {
-    id: string;
-    email: string;
-    name: string;
-    role: string;
-    createdAt: string;
-    membershipTier: string;
-    lastPaymentAt: string | null;
+  id: string;
+  email: string;
+  name: string;
+  role: Role;
+  createdAt: string;
+  membershipTier: "FREE" | "SILVER" | "GOLD" | "PLATINUM";
+  lastPaymentAt: string | null;
+};
+
+/** Full response from GET /api/admin/users */
+export type AdminUsersResponse = {
+  users: AdminUser[];
+  summary: {
+    total: number;
+    byMembership: Record<string, number>;
+  };
 };

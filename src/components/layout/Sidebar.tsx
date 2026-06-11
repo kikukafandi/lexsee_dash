@@ -1,120 +1,117 @@
 "use client";
 
-import Link from "next/link";
-import { removeToken } from "@/lib/auth";
-import type { Profile } from "@/lib/auth";
-import { useI18n } from "@/lib/i18n";
+// Sidebar.tsx — Fixed left navigation sidebar for the Admin Dashboard.
+// Shows the Lexsee brand logo and grouped navigation links.
+// Active page is highlighted with a gold left border and subtle background.
 
-export default function Sidebar({
-  activePath,
-  profile,
-}: {
-  activePath: string;
-  profile: Profile | null;
-}) {
-  const { t } = useI18n();
-  const navGroups = [
-    {
-      title: t("workspace"),
-      items: [
-        { label: t("overview"), href: "/overview" },
-        { label: t("matters"), href: "/matters" },
-        { label: t("clients"), href: "/clients" },
-        { label: t("documents"), href: "/documents" },
-      ],
-    },
-    {
-      title: t("operations"),
-      items: [
-        { label: t("billingInvoices"), href: "/billing-invoices" },
-        { label: t("reports"), href: "/reports" },
-        { label: t("auditLog"), href: "/audit-log" },
-      ],
-    },
-    {
-      title: t("administration"),
-      items: [
-        { label: t("usersRoles"), href: "/users-roles" },
-        { label: t("settings"), href: "/settings" },
-      ],
-    },
-  ];
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { 
+  LayoutDashboard, 
+  Users, 
+  CreditCard,
+  Package, 
+  Wallet, 
+  BookOpen, 
+  Database, 
+  FlaskConical
+} from "lucide-react";
+
+// Navigation structure — grouped by purpose
+const NAV_GROUPS = [
+  {
+    label: "WORKSPACE",
+    items: [
+      { href: "/overview", label: "Overview", icon: <LayoutDashboard size={18} /> },
+      { href: "/users", label: "Users", icon: <Users size={18} /> },
+      { href: "/membership", label: "Membership Plans", icon: <CreditCard size={18} /> },
+    ],
+  },
+  {
+    label: "OPERATIONS",
+    items: [
+      { href: "/orders", label: "Orders", icon: <Package size={18} /> },
+      { href: "/payments", label: "Payments", icon: <Wallet size={18} /> },
+      { href: "/legal-catalog", label: "Legal Catalog", icon: <BookOpen size={18} /> },
+      { href: "/knowledge-base", label: "Knowledge Base", icon: <Database size={18} /> },
+    ],
+  },
+  {
+    label: "ADMINISTRATION",
+    items: [
+      { href: "/testing", label: "Testing Suite", icon: <FlaskConical size={18} /> },
+    ],
+  },
+];
+
+export function Sidebar() {
+  const pathname = usePathname();
+
+  // Check if the given href matches the current page
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <aside className="w-64 shrink-0 border-r border-dividerGold bg-surface1 px-5 py-6">
-      <div className="mb-8">
+    <aside className="w-60 shrink-0 h-screen bg-surface-1 border-r border-gold/15 flex flex-col overflow-hidden">
+      {/* ── Logo + Brand ────────────────────────────────────────────── */}
+      <div className="px-5 py-5 border-b border-gold/15">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-lg bg-gold text-white flex items-center justify-center font-semibold">
-            L
+          {/* "L" icon with gold gradient background */}
+          <div className="w-9 h-9 rounded-lg bg-linear-to-br from-gold to-gold-dim flex items-center justify-center shrink-0">
+            <span className="text-maroon-deep font-bold text-base font-serif">L</span>
           </div>
           <div>
-            <div className="text-sm font-semibold text-textHigh">Lexsee</div>
-            <div className="text-[11px] uppercase tracking-widest text-textLow">
-              Admin console
-            </div>
+            <p className="text-gold font-bold text-sm font-serif tracking-wider leading-none">
+              LEXSEE
+            </p>
+            <p className="text-text-low text-[10px] tracking-widest uppercase mt-0.5">
+              Admin Console
+            </p>
           </div>
         </div>
       </div>
 
-      <nav className="space-y-6">
-        {navGroups.map((group) => (
-          <div key={group.title}>
-            <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-textLow">
-              {group.title}
-            </div>
-            <div className="space-y-1">
-              {group.items.map((item) => {
-                const active = activePath.startsWith(item.href);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`flex items-center justify-between rounded-lg px-3 py-2 text-sm transition ${
+      {/* ── Navigation Groups ────────────────────────────────────────── */}
+      <nav className="flex-1 overflow-y-auto py-4 px-3">
+        {NAV_GROUPS.map((group) => (
+          <div key={group.label} className="mb-5">
+            {/* Group label */}
+            <p className="text-text-low text-[10px] font-semibold tracking-widest uppercase px-2 mb-2">
+              {group.label}
+            </p>
+
+            {/* Nav items */}
+            {group.items.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`
+                    flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 text-sm transition-all
+                    ${
                       active
-                        ? "bg-gold text-white"
-                        : "text-textMed hover:bg-surface4 hover:text-textHigh"
-                    }`}
-                  >
-                    <span>{item.label}</span>
-                    {item.label === t("matters") && (
-                      <span className="rounded-full bg-surface2 px-2 py-0.5 text-[10px] text-textMed">
-                        24
-                      </span>
-                    )}
-                    {item.label === t("documents") && (
-                      <span className="rounded-full bg-surface2 px-2 py-0.5 text-[10px] text-textMed">
-                        NEW
-                      </span>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
+                        ? "bg-surface-3 text-gold border-l-2 border-gold font-medium"
+                        : "text-text-med hover:bg-surface-2 hover:text-text-high border-l-2 border-transparent"
+                    }
+                  `}
+                >
+                  <span className="text-base w-5 text-center shrink-0" aria-hidden="true">
+                    {item.icon}
+                  </span>
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
           </div>
         ))}
       </nav>
 
-      <div className="mt-8 rounded-xl border border-dividerGold bg-surface2 p-4">
-        <div className="text-xs text-textLow">{t("storage")}</div>
-        <div className="mt-2 h-2 w-full rounded-full bg-white">
-          <div className="h-2 w-[68%] rounded-full bg-gold" />
-        </div>
-        <div className="mt-2 text-xs text-textMed">68.4 / 100 GB</div>
-      </div>
-
-      <div className="mt-6 flex items-center justify-between border-t border-dividerGold pt-4">
-        <div className="text-sm text-textHigh">
-          {profile?.name || profile?.email || "Admin"}
-        </div>
-        <button
-          className="text-xs uppercase tracking-widest text-textLow"
-          onClick={() => {
-            removeToken();
-            window.location.href = "/login";
-          }}
-        >
-          Logout
-        </button>
+      {/* ── Bottom divider ───────────────────────────────────────────── */}
+      <div className="border-t border-gold/15 p-3">
+        <p className="text-text-low text-[10px] text-center">
+          Lexsee Admin Console v1.0
+        </p>
       </div>
     </aside>
   );

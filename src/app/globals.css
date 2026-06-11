@@ -1,46 +1,63 @@
 @import "tailwindcss";
 
-:root {
-  color-scheme: light;
-  --font-serif: "Georgia", "Times New Roman", serif;
+/* ─── Lexsee Brand Design Tokens ─────────────────────────────────────────────
+   These CSS variables become Tailwind utility classes automatically.
+   Example: --color-gold → bg-gold, text-gold, border-gold
+   ──────────────────────────────────────────────────────────────────────────── */
+@theme {
+  /* Background surfaces (dark luxury) */
+  --color-bg: #0f0000;
+  --color-surface-1: #1a0404;
+  --color-surface-2: #2a0909;
+  --color-surface-3: #3d0101;
+  --color-surface-4: #5c0a0a;
+
+  /* Brand colors */
+  --color-maroon: #3d0101;
+  --color-maroon-deep: #2a0000;
+  --color-maroon-dark: #5c0a0a;
+  --color-maroon-light: #8b0000;
+
+  /* Gold accent — primary brand color */
+  --color-gold: #c9a84c;
+  --color-gold-light: #e2c97e;
+  --color-gold-dim: #9a7e38;
+
+  /* Status colors */
+  --color-success: #43a047;
+  --color-danger: #e53935;
+  --color-warning: #f59e0b;
+
+  /* Semantic text colors */
+  --color-text-high: rgba(255, 255, 255, 0.9);
+  --color-text-med: rgba(255, 255, 255, 0.55);
+  --color-text-low: rgba(255, 255, 255, 0.3);
+
+  /* Serif font for headings */
+  --font-serif: Georgia, "Times New Roman", serif;
 }
 
-@theme inline {
-  --color-bg: #f7f5f2;
-  --color-surface1: #ffffff;
-  --color-surface2: #f3f1ee;
-  --color-surface3: #f9f1f1;
-  --color-surface4: #eee7e1;
-  --color-maroonLight: #8b0000;
-  --color-gold: #8b0000;
-  --color-goldLight: #a60f0f;
-  --color-textHigh: #1d1b16;
-  --color-textMed: #6f665e;
-  --color-textLow: #9a9188;
-  --color-borderGold: #e6e0d8;
-  --color-dividerGold: #efe9e2;
-  --color-success: #15803d;
-  --color-error: #b91c1c;
-  --color-warning: #b45309;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* ─── Base resets ──────────────────────────────────────────────────────────── */
+html,
 body {
-  background: var(--color-bg);
-  color: var(--color-textHigh);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  height: 100%;
+  background-color: #0f0000;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
-h1,
-h2,
-h3 {
-  font-family: var(--font-serif);
+/* Gold scrollbar for the luxury feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
-
-.lux-card {
-  border-radius: 14px;
-  border: 1px solid var(--color-borderGold);
-  background: var(--color-surface1);
-  box-shadow: 0 6px 20px rgba(25, 25, 25, 0.06);
+::-webkit-scrollbar-track {
+  background: #1a0404;
+}
+::-webkit-scrollbar-thumb {
+  background: #c9a84c40;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c9a84c80;
 }

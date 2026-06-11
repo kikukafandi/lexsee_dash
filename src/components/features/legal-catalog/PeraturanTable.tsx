@@ -1,30 +1,30 @@
-import DataTable from "@/components/ui/DataTable";
-import Badge from "@/components/ui/Badge";
-import type { PeraturanItem } from "@/types";
+import { DataTable } from "@/components/ui/DataTable";
+import { Badge } from "@/components/ui/Badge";
+import type { Peraturan } from "@/types";
 
 export default function PeraturanTable({
   data,
   onPreview,
 }: {
-  data: PeraturanItem[];
-  onPreview: (item: PeraturanItem) => void;
+  data: Peraturan[];
+  onPreview: (item: Peraturan) => void;
 }) {
   return (
     <DataTable
       data={data}
       columns={[
-        { key: "judul", label: "Judul" },
+        { accessor: "judul", header: "Judul" },
         {
-          key: "jenis",
-          label: "Jenis",
-          render: (row) => <Badge label={row.jenis || "-"} />,
+          accessor: "jenis",
+          header: "Jenis",
+          render: (row: Peraturan) => <Badge>{(row as unknown as { jenis?: string }).jenis || "-"}</Badge>,
         },
-        { key: "nomor", label: "Nomor" },
-        { key: "tahun", label: "Tahun" },
+        { accessor: "nomor", header: "Nomor" },
+        { accessor: "tahun", header: "Tahun" },
         {
-          key: "id",
-          label: "PDF",
-          render: (row) => (
+          accessor: "id",
+          header: "PDF",
+          render: (row: Peraturan) => (
             <button
               className="text-gold text-xs"
               onClick={() => onPreview(row)}
@@ -34,7 +34,7 @@ export default function PeraturanTable({
           ),
         },
       ]}
-      emptyText="Data peraturan belum tersedia."
+      emptyMessage="Data peraturan belum tersedia."
     />
   );
 }

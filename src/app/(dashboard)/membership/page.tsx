@@ -200,7 +200,7 @@ export default function MembershipPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {!plan.isActive && <Badge variant="secondary">Arsip</Badge>}
+                      {!plan.isActive && <Badge variant="default">Arsip</Badge>}
                       {plan.isPopular && <Badge variant="gold">Populer</Badge>}
                     </div>
                   </div>

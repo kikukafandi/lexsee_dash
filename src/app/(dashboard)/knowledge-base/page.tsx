@@ -9,6 +9,7 @@ import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { ThumbsUp, ThumbsDown, CheckCircle2, XCircle, Hourglass } from "lucide-react";
+import ScrapePanel from "@/components/features/knowledge-base/ScrapePanel";
 import type { KbStats, LegalDocument, DocumentListResponse, DocType } from "@/types";
 
 // The document type options available for ingestion
@@ -362,6 +363,16 @@ export default function KnowledgeBasePage() {
 
       {/* ── Stats row ─────────────────────────────────────────────────── */}
       <StatsRow stats={stats} />
+
+      {/* ── Scraping multi-sumber ─────────────────────────────────────── */}
+      <div>
+        <h2 className="text-text-high font-serif text-lg mb-1">Scraping Multi-Sumber</h2>
+        <p className="text-text-med text-sm mb-4">
+          Ambil katalog dulu, lalu proses (download + ekstrak). Embedding bisa ditunda dan dijalankan massal lewat
+          tombol <span className="text-gold">Embed Pending</span>.
+        </p>
+        <ScrapePanel onChanged={() => { loadStats(); loadDocs(1); }} />
+      </div>
 
       {/* ── 2-column layout: doc list + ingest form ────────────────── */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">

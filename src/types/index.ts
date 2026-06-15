@@ -231,3 +231,32 @@ export type AdminUsersResponse = {
     byMembership: Record<string, number>;
   };
 };
+
+/** Ringkasan satu sumber scraping dari GET /api/legal/admin/scrape/sources */
+export type ScrapeSource = {
+  key: string;
+  label: string;
+  available: boolean;
+  total: number;
+  downloaded: number;
+  pendingDownload: number;
+  embedPending: number;
+  embedDone: number;
+  embedFailed: number;
+};
+
+/** Satu baris log scraping (via SSE atau snapshot job) */
+export type ScrapeLogLine = {
+  seq: number;
+  level: "info" | "warn" | "error" | "success";
+  message: string;
+};
+
+/** Hitungan progres job scraping */
+export type ScrapeCounts = {
+  total: number;
+  processed: number;
+  ingested: number;
+  skipped: number;
+  failed: number;
+};

@@ -6,12 +6,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { apiFetch } from "@/lib/api";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { Database, Download, Cpu, RefreshCw, Terminal, Upload } from "lucide-react";
+import { Database, Download, Cpu, RefreshCw, Terminal, Upload, Square } from "lucide-react";
 import type { ScrapeSource, ScrapeLogLine, ScrapeCounts } from "@/types";
 
 const TOKEN_KEY = "lexsee_admin_token";
 
-type JobStatus = "RUNNING" | "DONE" | "FAILED" | null;
+type JobStatus = "RUNNING" | "DONE" | "FAILED" | "CANCELLED" | null;
 type JobPhase = "CATALOG" | "PROCESS" | "EMBED" | null;
 
 const LEVEL_COLOR: Record<string, string> = {
@@ -36,6 +36,7 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
   // processed/total tak bermakna; kita tampilkan baru/sudah-ada saja.
   const [jobPhase, setJobPhase] = useState<JobPhase>(null);
   const [busy, setBusy] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
   const [error, setError] = useState("");
 
   // Upload manual PDF
@@ -75,6 +76,7 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
       setLogs([]);
       setCounts(null);
       setJobStatus("RUNNING");
+      setCancelling(false);
       setActiveJobId(jobId);
 
       const token = typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null;
@@ -138,6 +140,19 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
       setError(err instanceof Error ? err.message : "Gagal memulai job.");
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function stopJob() {
+    if (!activeJobId) return;
+    setCancelling(true);
+    setError("");
+    try {
+      await apiFetch(`/api/legal/admin/scrape/jobs/${activeJobId}/cancel`, { method: "POST" });
+      // Status final (CANCELLED) datang lewat SSE 'done'; biarkan stream menutup.
+    } catch (err) {
+      setCancelling(false);
+      setError(err instanceof Error ? err.message : "Gagal menghentikan job.");
     }
   }
 
@@ -318,6 +333,17 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
             </div>
             <div className="flex items-center gap-3 text-xs">
               {counts && <CountsLine counts={counts} phase={jobPhase} />}
+              {running && (
+                <button
+                  onClick={stopJob}
+                  disabled={cancelling}
+                  title="Hentikan job yang sedang berjalan (progres tersimpan tetap ada)"
+                  className="flex items-center gap-1.5 rounded-lg border border-danger/40 px-2.5 py-1 text-danger hover:bg-danger/10 transition-colors disabled:opacity-50"
+                >
+                  <Square size={11} className="fill-current" />
+                  {cancelling ? "Menghentikan…" : "Stop"}
+                </button>
+              )}
               <StatusBadge status={jobStatus} />
             </div>
           </div>
@@ -381,7 +407,8 @@ function StatusBadge({ status }: { status: JobStatus }) {
     RUNNING: "bg-gold/15 text-gold",
     DONE: "bg-success/15 text-success",
     FAILED: "bg-danger/15 text-danger",
+    CANCELLED: "bg-warning/15 text-warning",
   };
-  const label: Record<string, string> = { RUNNING: "Berjalan", DONE: "Selesai", FAILED: "Gagal" };
+  const label: Record<string, string> = { RUNNING: "Berjalan", DONE: "Selesai", FAILED: "Gagal", CANCELLED: "Dibatalkan" };
   return <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${map[status]}`}>{label[status]}</span>;
 }

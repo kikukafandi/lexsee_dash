@@ -12,6 +12,7 @@ import type { ScrapeSource, ScrapeLogLine, ScrapeCounts } from "@/types";
 const TOKEN_KEY = "lexsee_admin_token";
 
 type JobStatus = "RUNNING" | "DONE" | "FAILED" | null;
+type JobPhase = "CATALOG" | "PROCESS" | "EMBED" | null;
 
 const LEVEL_COLOR: Record<string, string> = {
   info: "text-text-med",
@@ -30,6 +31,10 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
   const [logs, setLogs] = useState<ScrapeLogLine[]>([]);
   const [counts, setCounts] = useState<ScrapeCounts | null>(null);
   const [jobStatus, setJobStatus] = useState<JobStatus>(null);
+  // Fase job aktif — menentukan cara membaca progres. Pada KATALOG, `total`
+  // bertambah seiring paginasi (backfill seluruh katalog), jadi rasio
+  // processed/total tak bermakna; kita tampilkan baru/sudah-ada saja.
+  const [jobPhase, setJobPhase] = useState<JobPhase>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -119,7 +124,7 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
     [loadSources, onChanged]
   );
 
-  async function startJob(endpoint: string, body: Record<string, unknown>) {
+  async function startJob(endpoint: string, body: Record<string, unknown>, phase: JobPhase) {
     setBusy(true);
     setError("");
     try {
@@ -127,6 +132,7 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
         method: "POST",
         body: JSON.stringify(body),
       });
+      setJobPhase(phase);
       openStream(res.jobId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal memulai job.");
@@ -189,7 +195,7 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
         </label>
 
         <div className="flex items-center gap-2 ml-auto">
-          <span className="text-text-med text-xs">Batas/proses</span>
+          <span className="text-text-med text-xs" title="Berapa dokumen yang diunduh per klik 'Proses'. Tidak membatasi 'Katalog Penuh'.">Batas unduh/Proses</span>
           <input
             type="number"
             min={1}
@@ -198,7 +204,7 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
             className="w-20 bg-surface-2 border border-gold/25 rounded-lg px-2 py-1.5 text-text-high text-sm focus:outline-none focus:border-gold/60"
           />
           <button
-            onClick={() => startJob("/api/legal/admin/scrape/embed-pending", {})}
+            onClick={() => startJob("/api/legal/admin/scrape/embed-pending", {}, "EMBED")}
             disabled={busy || running}
             className="flex items-center gap-1.5 rounded-lg border border-gold/40 px-3 py-1.5 text-xs text-gold hover:bg-gold/10 transition-colors disabled:opacity-40"
           >
@@ -238,6 +244,14 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
       </div>
 
       {/* ── Source cards ─────────────────────────────────────────── */}
+      {/* Alur dua fase */}
+      <p className="text-text-low text-xs leading-relaxed">
+        <span className="text-text-med">Alur:</span> <b className="text-text-high">Katalog Penuh</b> menelusuri
+        seluruh katalog sumber via paginasi (menembus 50 dokumen pertama, dokumen baru ditambahkan & yang sudah ada
+        dilewati — bisa beberapa menit) → lalu <b className="text-text-high">Proses</b> mengunduh PDF + mengekstrak teks
+        (sebanyak <i>Batas unduh</i> per klik) → <b className="text-text-high">Embed Pending</b> untuk memvektorkan.
+      </p>
+
       {loadingSources ? (
         <div className="flex justify-center py-8"><LoadingSpinner /></div>
       ) : (
@@ -268,15 +282,16 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
               {/* Actions */}
               <div className="flex gap-2 mt-4">
                 <button
-                  onClick={() => startJob("/api/legal/admin/scrape/catalog", { source: s.key })}
+                  onClick={() => startJob("/api/legal/admin/scrape/catalog", { source: s.key }, "CATALOG")}
                   disabled={!s.available || busy || running}
+                  title="Menelusuri seluruh katalog sumber via paginasi (bisa beberapa menit). Dokumen baru ditambahkan, yang sudah ada dilewati."
                   className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-gold/30 px-3 py-2 text-xs text-text-high hover:bg-gold/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  <RefreshCw size={13} /> Refresh Katalog
+                  <RefreshCw size={13} /> Katalog Penuh
                 </button>
                 <button
                   onClick={() =>
-                    startJob("/api/legal/admin/scrape/process", { source: s.key, embedImmediately, limit })
+                    startJob("/api/legal/admin/scrape/process", { source: s.key, embedImmediately, limit }, "PROCESS")
                   }
                   disabled={!s.available || busy || running}
                   className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-gold px-3 py-2 text-xs font-semibold text-maroon-deep hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
@@ -302,13 +317,7 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
               {running && <LoadingSpinner size="sm" />}
             </div>
             <div className="flex items-center gap-3 text-xs">
-              {counts && (
-                <span className="text-text-med">
-                  {counts.processed}/{counts.total} · <span className="text-success">{counts.ingested} ok</span> ·{" "}
-                  <span className="text-warning">{counts.skipped} lewat</span> ·{" "}
-                  <span className="text-danger">{counts.failed} gagal</span>
-                </span>
-              )}
+              {counts && <CountsLine counts={counts} phase={jobPhase} />}
               <StatusBadge status={jobStatus} />
             </div>
           </div>
@@ -328,6 +337,32 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
         </div>
       )}
     </div>
+  );
+}
+
+function CountsLine({ counts, phase }: { counts: ScrapeCounts; phase: JobPhase }) {
+  // Fase KATALOG: `total` ikut bertambah saat paginasi (backfill), sehingga
+  // rasio processed/total selalu ~penuh dan menyesatkan. Tampilkan jumlah
+  // dokumen diperiksa + baru/sudah-ada. Fase lain memakai rasio progres biasa.
+  if (phase === "CATALOG") {
+    return (
+      <span className="text-text-med">
+        {counts.processed} diperiksa · <span className="text-success">{counts.ingested} baru</span> ·{" "}
+        <span className="text-warning">{counts.skipped} sudah ada</span>
+        {counts.failed > 0 && (
+          <>
+            {" "}· <span className="text-danger">{counts.failed} gagal</span>
+          </>
+        )}
+      </span>
+    );
+  }
+  return (
+    <span className="text-text-med">
+      {counts.processed}/{counts.total} · <span className="text-success">{counts.ingested} ok</span> ·{" "}
+      <span className="text-warning">{counts.skipped} lewat</span> ·{" "}
+      <span className="text-danger">{counts.failed} gagal</span>
+    </span>
   );
 }
 

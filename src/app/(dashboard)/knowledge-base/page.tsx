@@ -49,7 +49,7 @@ function StatsRow({ stats }: { stats: KbStats | null }) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
       {items.map((item, i) => (
-        <div key={i} className="bg-surface-1 border border-gold/25 rounded-xl p-3 text-center">
+        <div key={i} className="bg-surface-1 border border-neutral-200 rounded-xl p-3 text-center">
           <p className={`text-2xl font-serif font-bold ${item.color}`}>{item.value}</p>
           <p className="text-text-low text-xs mt-1 leading-tight">{item.label}</p>
         </div>
@@ -122,7 +122,7 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
   }
 
   return (
-    <div className="bg-surface-1 border border-gold/25 rounded-xl p-5">
+    <div className="bg-surface-1 border border-neutral-200 rounded-xl p-5">
       <h2 className="text-text-high font-serif text-lg mb-4">Tambah Dokumen ke Knowledge Base</h2>
 
       {/* Tab buttons */}
@@ -133,8 +133,8 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
             onClick={() => { setTab(t.id); setResult(""); setError(""); }}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               tab === t.id
-                ? "bg-gold text-maroon-deep"
-                : "bg-surface-2 text-text-med hover:text-text-high border border-gold/15"
+                ? "bg-gold text-white"
+                : "bg-surface-2 text-text-med hover:text-text-high border border-neutral-200"
             }`}
           >
             {t.label}
@@ -150,13 +150,13 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
             value={jdihQuery}
             onChange={(e) => setJdihQuery(e.target.value)}
             placeholder="Kata kunci (contoh: hak asasi manusia)"
-            className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60"
+            className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
           />
           <div className="flex gap-3">
             <select
               value={jdihType}
               onChange={(e) => setJdihType(e.target.value as DocType)}
-              className="flex-1 bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60"
+              className="flex-1 bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
             >
               {DOC_TYPE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
             </select>
@@ -165,7 +165,7 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
               min={1} max={10}
               value={jdihLimit}
               onChange={(e) => setJdihLimit(Number(e.target.value))}
-              className="w-20 bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60"
+              className="w-20 bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
             />
           </div>
         </div>
@@ -179,12 +179,12 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
             value={manualTitle}
             onChange={(e) => setManualTitle(e.target.value)}
             placeholder="Judul dokumen"
-            className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60"
+            className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
           />
           <select
             value={manualType}
             onChange={(e) => setManualType(e.target.value as DocType)}
-            className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60"
+            className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
           >
             {DOC_TYPE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
@@ -193,7 +193,7 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
             onChange={(e) => setManualText(e.target.value)}
             rows={5}
             placeholder="Paste teks dokumen hukum di sini..."
-            className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 resize-y"
+            className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
           />
         </div>
       )}
@@ -224,7 +224,7 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
       <button
         onClick={runIngest}
         disabled={loading || (tab === "manual" && (!manualTitle || !manualText))}
-        className="mt-4 w-full py-2.5 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="mt-4 w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {loading ? <><LoadingSpinner size="sm" /> Memproses...</> : "Jalankan"}
       </button>
@@ -377,8 +377,8 @@ export default function KnowledgeBasePage() {
       {/* ── 2-column layout: doc list + ingest form ────────────────── */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
         {/* Document list */}
-        <div className="bg-surface-1 border border-gold/25 rounded-xl overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3 border-b border-gold/15">
+        <div className="bg-surface-1 border border-neutral-200 rounded-xl overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3 border-b border-neutral-200">
             <h2 className="text-text-high font-serif text-lg">Daftar Dokumen</h2>
             <button
               onClick={() => { loadDocs(1); loadStats(); }}

@@ -5,59 +5,61 @@
    Example: --color-gold → bg-gold, text-gold, border-gold
    ──────────────────────────────────────────────────────────────────────────── */
 @theme {
-  /* Background surfaces (dark luxury) */
-  --color-bg: #0f0000;
-  --color-surface-1: #1a0404;
-  --color-surface-2: #2a0909;
-  --color-surface-3: #3d0101;
-  --color-surface-4: #5c0a0a;
+  /* Surfaces — netral profesional (clean, tanpa tint/glass) */
+  --color-bg: #f7f8fa;         /* abu-abu sangat terang */
+  --color-surface-1: #ffffff;  /* kartu / panel */
+  --color-surface-2: #f1f3f5;  /* input / hover */
+  --color-surface-3: #eef1f4;  /* code / segment */
+  --color-surface-4: #e2e6eb;  /* track / progress */
 
-  /* Brand colors */
-  --color-maroon: #3d0101;
-  --color-maroon-deep: #2a0000;
-  --color-maroon-dark: #5c0a0a;
-  --color-maroon-light: #8b0000;
+  /* Brand merah — dipakai sebagai aksen, bukan latar dominan */
+  --color-maroon: #c0162c;
+  --color-maroon-deep: #9e0f22;
+  --color-maroon-dark: #a01325;
+  --color-maroon-light: #d6324a;
 
-  /* Gold accent — primary brand color */
-  --color-gold: #c9a84c;
-  --color-gold-light: #e2c97e;
-  --color-gold-dim: #9a7e38;
+  /* "gold" dipetakan ke merah brand agar utilitas lama tetap on-brand */
+  --color-gold: #c0162c;
+  --color-gold-light: #d6324a;
+  --color-gold-dim: #9e0f22;
 
-  /* Status colors */
-  --color-success: #43a047;
-  --color-danger: #e53935;
-  --color-warning: #f59e0b;
+  /* Status colors (palet profesional) */
+  --color-success: #16a34a;
+  --color-danger: #dc2626;
+  --color-warning: #d97706;
 
-  /* Semantic text colors */
-  --color-text-high: rgba(255, 255, 255, 0.9);
-  --color-text-med: rgba(255, 255, 255, 0.55);
-  --color-text-low: rgba(255, 255, 255, 0.3);
+  /* Semantic text — slate netral */
+  --color-text-high: #1f2430;
+  --color-text-med: #5b6472;
+  --color-text-low: #98a1b0;
 
-  /* Serif font for headings */
-  --font-serif: Georgia, "Times New Roman", serif;
+  /* Font utama dashboard — Poppins */
+  --font-sans: var(--font-poppins), system-ui, -apple-system, sans-serif;
+  /* "serif" dipetakan ke Poppins juga agar heading lama (font-serif) ikut konsisten */
+  --font-serif: var(--font-poppins), system-ui, -apple-system, sans-serif;
 }
 
 /* ─── Base resets ──────────────────────────────────────────────────────────── */
 html,
 body {
   height: 100%;
-  background-color: #0f0000;
-  color: rgba(255, 255, 255, 0.9);
-  font-family: system-ui, -apple-system, sans-serif;
+  background-color: #f7f8fa;
+  color: #1f2430;
+  font-family: var(--font-poppins), system-ui, -apple-system, sans-serif;
 }
 
-/* Gold scrollbar for the luxury feel */
+/* Scrollbar netral */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #1a0404;
+  background: #eef1f4;
 }
 ::-webkit-scrollbar-thumb {
-  background: #c9a84c40;
-  border-radius: 3px;
+  background: #c7ced8;
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #c9a84c80;
+  background: #aab3c0;
 }

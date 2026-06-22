@@ -22,6 +22,8 @@ export default function DashboardLayout({
   const [user, setUser] = useState<User | null>(null);
   // Show loader while we verify auth — prevents a flash of protected content
   const [checking, setChecking] = useState(true);
+  // Drawer sidebar untuk layar kecil (mobile/tablet)
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     // Safety net: if auth takes more than 8 seconds, redirect to login
@@ -78,13 +80,17 @@ export default function DashboardLayout({
 
   return (
     <div className="flex h-screen bg-bg overflow-hidden">
-      {/* Fixed sidebar on the left */}
-      <Sidebar />
+      {/* Sidebar: statis di desktop, drawer di layar kecil */}
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Right side: topbar + scrollable main content */}
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-        <Topbar user={user} onLogout={handleLogout} />
-        <main className="flex-1 overflow-y-auto p-6">
+        <Topbar
+          user={user}
+          onLogout={handleLogout}
+          onMenuClick={() => setSidebarOpen(true)}
+        />
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
           {children}
         </main>
       </div>

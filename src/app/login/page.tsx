@@ -63,17 +63,12 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center p-4">
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-gold/5 rounded-full blur-3xl" />
-      </div>
-
       <div className="relative w-full max-w-md">
         {/* ── Brand header ─────────────────────────────────────────── */}
         <div className="text-center mb-8">
-          {/* Gold "L" logo */}
-          <div className="w-16 h-16 rounded-2xl bg-linear-to-br from-gold to-gold-dim flex items-center justify-center mx-auto mb-4 shadow-lg shadow-gold/20">
-            <span className="text-maroon-deep font-bold text-2xl font-serif">L</span>
+          {/* "L" logo — solid merah (tanpa gradient) */}
+          <div className="w-16 h-16 rounded-2xl bg-maroon flex items-center justify-center mx-auto mb-4 shadow-lg shadow-maroon/20">
+            <span className="text-white font-bold text-2xl font-serif">L</span>
           </div>
           <h1 className="text-3xl font-serif text-gold tracking-wide">LEXSEE</h1>
           <p className="text-text-low text-xs tracking-widest uppercase mt-1">
@@ -82,7 +77,7 @@ export default function LoginPage() {
         </div>
 
         {/* ── Login card ───────────────────────────────────────────── */}
-        <div className="bg-surface-1 border border-gold/25 rounded-2xl p-8 shadow-2xl shadow-black/50">
+        <div className="bg-surface-1 border border-neutral-200 rounded-2xl p-8 shadow-xl shadow-black/10">
           <h2 className="text-text-high font-serif text-xl mb-1">
             Selamat datang kembali
           </h2>
@@ -108,7 +103,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full bg-surface-2 border border-gold/25 rounded-lg px-4 py-2.5 text-text-high text-sm placeholder-text-low focus:outline-none focus:border-gold/60 focus:bg-surface-2 transition-colors"
+                className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-4 py-2.5 text-text-high text-sm placeholder-text-low focus:outline-none focus:border-maroon focus:bg-surface-2 transition-colors"
                 placeholder="admin@lexsee.id"
               />
             </div>
@@ -123,7 +118,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full bg-surface-2 border border-gold/25 rounded-lg px-4 py-2.5 text-text-high text-sm placeholder-text-low focus:outline-none focus:border-gold/60 transition-colors"
+                className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-4 py-2.5 text-text-high text-sm placeholder-text-low focus:outline-none focus:border-maroon transition-colors"
                 placeholder="••••••••"
               />
             </div>
@@ -139,7 +134,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg bg-gold text-maroon-deep font-bold text-sm hover:bg-gold-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
+              className="w-full py-3 rounded-lg bg-gold text-white font-bold text-sm hover:bg-gold-light transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-2"
             >
               {loading ? (
                 <>
@@ -153,7 +148,7 @@ export default function LoginPage() {
           </form>
 
           {/* Default credentials hint for development */}
-          <p className="mt-5 text-center text-text-low text-xs border-t border-gold/10 pt-4">
+          <p className="mt-5 text-center text-text-low text-xs border-t border-neutral-100 pt-4">
             Dev credentials: admin@lexsee.id / Admin@123
           </p>
         </div>

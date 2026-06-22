@@ -22,6 +22,7 @@ type DataTableProps<T extends { id?: string }> = {
   page?: number;
   totalPages?: number;
   onPageChange?: (page: number) => void;
+  onRowClick?: (row: T) => void;
   emptyMessage?: string;
   emptyDescription?: string;
 };
@@ -33,6 +34,7 @@ export function DataTable<T extends { id?: string }>({
   page = 1,
   totalPages = 1,
   onPageChange,
+  onRowClick,
   emptyMessage,
   emptyDescription,
 }: DataTableProps<T>) {
@@ -47,7 +49,7 @@ export function DataTable<T extends { id?: string }>({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-gold/15">
+            <tr className="border-b border-neutral-200">
               {columns.map((col) => (
                 <th
                   key={String(col.accessor)}
@@ -77,7 +79,10 @@ export function DataTable<T extends { id?: string }>({
               data.map((row, rowIndex) => (
                 <tr
                   key={row.id ?? rowIndex}
-                  className="border-b border-gold/10 hover:bg-gold/5 transition-colors"
+                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  className={`border-b border-neutral-100 hover:bg-neutral-50 transition-colors ${
+                    onRowClick ? "cursor-pointer" : ""
+                  }`}
                 >
                   {columns.map((col) => (
                     <td
@@ -98,11 +103,11 @@ export function DataTable<T extends { id?: string }>({
 
       {/* Pagination controls — only shown if there are multiple pages */}
       {totalPages > 1 && onPageChange && (
-        <div className="flex items-center justify-end gap-3 px-4 py-3 border-t border-gold/15 mt-2">
+        <div className="flex items-center justify-end gap-3 px-4 py-3 border-t border-neutral-200 mt-2">
           <button
             onClick={() => onPageChange(page - 1)}
             disabled={page <= 1}
-            className="px-3 py-1 rounded border border-gold/25 text-text-med text-xs hover:text-gold hover:border-gold/50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="px-3 py-1 rounded border border-neutral-200 text-text-med text-xs hover:text-gold hover:border-neutral-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
             ← Prev
           </button>
@@ -112,7 +117,7 @@ export function DataTable<T extends { id?: string }>({
           <button
             onClick={() => onPageChange(page + 1)}
             disabled={page >= totalPages}
-            className="px-3 py-1 rounded border border-gold/25 text-text-med text-xs hover:text-gold hover:border-gold/50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="px-3 py-1 rounded border border-neutral-200 text-text-med text-xs hover:text-gold hover:border-neutral-400 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
             Next →
           </button>

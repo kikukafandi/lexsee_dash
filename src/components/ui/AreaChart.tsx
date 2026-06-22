@@ -30,8 +30,8 @@ export default function AreaChart({
             <Area
               type="monotone"
               dataKey="value"
-              stroke="#8B0000"
-              fill="rgba(139,0,0,0.12)"
+              stroke="#C0162C"
+              fill="rgba(192,22,44,0.12)"
             />
           </ReAreaChart>
         </ResponsiveContainer>

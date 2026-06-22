@@ -30,12 +30,12 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
   return (
     // Semi-transparent backdrop
     <div
-      className="fixed inset-0 z-50 flex flex-col bg-black/80"
+      className="fixed inset-0 z-50 flex flex-col bg-black/40"
       onClick={onClose}
     >
       {/* Header bar — click here does NOT close (stopPropagation) */}
       <div
-        className="flex items-center justify-between px-6 py-3 bg-surface-2 border-b border-gold/20 shrink-0"
+        className="flex items-center justify-between px-6 py-3 bg-surface-2 border-b border-neutral-200 shrink-0"
         onClick={(e) => e.stopPropagation()}
       >
         {title && (
@@ -45,7 +45,7 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
         )}
         <button
           onClick={onClose}
-          className="ml-auto flex items-center gap-1.5 text-text-med hover:text-gold transition-colors text-sm px-3 py-1 rounded border border-gold/20 hover:border-gold/50"
+          className="ml-auto flex items-center gap-1.5 text-text-med hover:text-gold transition-colors text-sm px-3 py-1 rounded border border-neutral-200 hover:border-neutral-400"
         >
           <X size={14} /> Tutup
         </button>

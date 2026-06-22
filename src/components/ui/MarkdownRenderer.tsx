@@ -31,7 +31,7 @@ const components: Components = {
     <li className="leading-relaxed pl-1">{children}</li>
   ),
   blockquote: ({ children }) => (
-    <blockquote className="border-l-2 border-gold/40 pl-3 my-3 text-text-med italic text-sm">
+    <blockquote className="border-l-2 border-neutral-300 pl-3 my-3 text-text-med italic text-sm">
       {children}
     </blockquote>
   ),
@@ -39,7 +39,7 @@ const components: Components = {
     const isBlock = className?.startsWith("language-");
     if (isBlock) {
       return (
-        <code className="block bg-surface-3 border border-gold/15 rounded-lg p-3 text-xs font-mono text-gold overflow-x-auto whitespace-pre my-3">
+        <code className="block bg-surface-3 border border-neutral-200 rounded-lg p-3 text-xs font-mono text-gold overflow-x-auto whitespace-pre my-3">
           {children}
         </code>
       );
@@ -51,7 +51,7 @@ const components: Components = {
     );
   },
   pre: ({ children }) => <>{children}</>,
-  hr: () => <hr className="border-gold/15 my-4" />,
+  hr: () => <hr className="border-neutral-200 my-4" />,
   a: ({ href, children }) => (
     <a
       href={href}
@@ -67,12 +67,12 @@ const components: Components = {
       <table className="w-full text-sm border-collapse">{children}</table>
     </div>
   ),
-  thead: ({ children }) => <thead className="border-b border-gold/25">{children}</thead>,
+  thead: ({ children }) => <thead className="border-b border-neutral-200">{children}</thead>,
   th: ({ children }) => (
     <th className="text-left text-gold text-xs uppercase tracking-wider py-2 pr-4 font-medium">{children}</th>
   ),
   td: ({ children }) => (
-    <td className="text-text-med text-sm py-2 pr-4 border-b border-gold/10">{children}</td>
+    <td className="text-text-med text-sm py-2 pr-4 border-b border-neutral-100">{children}</td>
   ),
 };
 

@@ -195,7 +195,7 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
   return (
     <div className="space-y-5">
       {/* ── Control bar ──────────────────────────────────────────── */}
-      <div className="bg-surface-1 border border-gold/25 rounded-xl p-4 flex flex-wrap items-center gap-4">
+      <div className="bg-surface-1 border border-neutral-200 rounded-xl p-4 flex flex-wrap items-center gap-4">
         <label className="flex items-center gap-2 cursor-pointer select-none">
           <input
             type="checkbox"
@@ -216,12 +216,12 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
             min={1}
             value={limit}
             onChange={(e) => setLimit(Math.max(1, Number(e.target.value)))}
-            className="w-20 bg-surface-2 border border-gold/25 rounded-lg px-2 py-1.5 text-text-high text-sm focus:outline-none focus:border-gold/60"
+            className="w-20 bg-surface-2 border border-neutral-200 rounded-lg px-2 py-1.5 text-text-high text-sm focus:outline-none focus:border-maroon"
           />
           <button
             onClick={() => startJob("/api/legal/admin/scrape/embed-pending", {}, "EMBED")}
             disabled={busy || running}
-            className="flex items-center gap-1.5 rounded-lg border border-gold/40 px-3 py-1.5 text-xs text-gold hover:bg-gold/10 transition-colors disabled:opacity-40"
+            className="flex items-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-1.5 text-xs text-gold hover:bg-neutral-100 transition-colors disabled:opacity-40"
           >
             <Cpu size={14} /> Embed Pending (semua)
           </button>
@@ -229,7 +229,7 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
       </div>
 
       {/* ── Upload PDF manual ────────────────────────────────────── */}
-      <div className="bg-surface-1 border border-gold/25 rounded-xl p-4">
+      <div className="bg-surface-1 border border-neutral-200 rounded-xl p-4">
         <div className="flex items-center gap-2 text-text-high text-sm mb-3">
           <Upload size={15} className="text-gold" /> Upload PDF Manual
           <span className="text-text-low text-xs">(dokumen milik sendiri → masuk katalog, embed via Embed Pending)</span>
@@ -245,12 +245,12 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
             value={uploadTitle}
             onChange={(e) => setUploadTitle(e.target.value)}
             placeholder="Judul (opsional — default nama file)"
-            className="flex-1 min-w-[200px] bg-surface-2 border border-gold/25 rounded-lg px-3 py-1.5 text-text-high text-sm focus:outline-none focus:border-gold/60"
+            className="flex-1 min-w-[200px] bg-surface-2 border border-neutral-200 rounded-lg px-3 py-1.5 text-text-high text-sm focus:outline-none focus:border-maroon"
           />
           <button
             onClick={uploadManual}
             disabled={!uploadFile || uploading}
-            className="flex items-center gap-1.5 rounded-lg bg-gold px-4 py-1.5 text-xs font-semibold text-maroon-deep hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="flex items-center gap-1.5 rounded-lg bg-gold px-4 py-1.5 text-xs font-semibold text-white hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {uploading ? <LoadingSpinner size="sm" /> : <Upload size={13} />} Upload
           </button>
@@ -274,7 +274,7 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
           {sources.map((s) => (
             <div
               key={s.key}
-              className={`bg-surface-1 border rounded-xl p-4 ${s.available ? "border-gold/25" : "border-gold/10 opacity-60"}`}
+              className={`bg-surface-1 border rounded-xl p-4 ${s.available ? "border-neutral-200" : "border-neutral-100 opacity-60"}`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -282,7 +282,7 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
                   <h3 className="text-text-high font-medium text-sm">{s.label}</h3>
                 </div>
                 {!s.available && (
-                  <span className="text-text-low text-[11px] border border-gold/20 rounded px-1.5 py-0.5">belum tersedia</span>
+                  <span className="text-text-low text-[11px] border border-neutral-200 rounded px-1.5 py-0.5">belum tersedia</span>
                 )}
               </div>
 
@@ -300,7 +300,7 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
                   onClick={() => startJob("/api/legal/admin/scrape/catalog", { source: s.key }, "CATALOG")}
                   disabled={!s.available || busy || running}
                   title="Menelusuri seluruh katalog sumber via paginasi (bisa beberapa menit). Dokumen baru ditambahkan, yang sudah ada dilewati."
-                  className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-gold/30 px-3 py-2 text-xs text-text-high hover:bg-gold/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-neutral-300 px-3 py-2 text-xs text-text-high hover:bg-neutral-100 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <RefreshCw size={13} /> Katalog Penuh
                 </button>
@@ -309,7 +309,7 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
                     startJob("/api/legal/admin/scrape/process", { source: s.key, embedImmediately, limit }, "PROCESS")
                   }
                   disabled={!s.available || busy || running}
-                  className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-gold px-3 py-2 text-xs font-semibold text-maroon-deep hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="flex-1 flex items-center justify-center gap-1.5 rounded-lg bg-gold px-3 py-2 text-xs font-semibold text-white hover:bg-gold-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   <Download size={13} /> Proses
                 </button>
@@ -325,8 +325,8 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
 
       {/* ── Live log viewer ──────────────────────────────────────── */}
       {activeJobId && (
-        <div className="bg-surface-1 border border-gold/25 rounded-xl overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-2.5 border-b border-gold/15">
+        <div className="bg-surface-1 border border-neutral-200 rounded-xl overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-neutral-200">
             <div className="flex items-center gap-2 text-text-high text-sm">
               <Terminal size={15} className="text-gold" /> Log Scraping
               {running && <LoadingSpinner size="sm" />}
@@ -394,7 +394,7 @@ function CountsLine({ counts, phase }: { counts: ScrapeCounts; phase: JobPhase }
 
 function Stat({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="bg-surface-2 border border-gold/15 rounded-lg p-2 text-center">
+    <div className="bg-surface-2 border border-neutral-200 rounded-lg p-2 text-center">
       <p className={`text-lg font-serif font-bold ${color}`}>{value}</p>
       <p className="text-text-low text-[10px] mt-0.5 leading-tight">{label}</p>
     </div>

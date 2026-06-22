@@ -11,19 +11,36 @@ import { apiFetch } from "@/lib/api";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge, orderStatusVariant } from "@/components/ui/Badge";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { DetailModal } from "@/components/ui/DetailModal";
 import type { Order, Book } from "@/types";
 
+// Order admin = order + relasi user pemesan
+type AdminOrder = Order & {
+  user?: { id: string; name: string; email: string } | null;
+  address?: string;
+  cityId?: string;
+  postalCode?: string | null;
+  items?: { quantity: number; price: number; book?: { title: string } }[];
+};
+
 export default function OrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selected, setSelected] = useState<AdminOrder | null>(null);
+
+  const fmtRp = (n: number | string) => "Rp " + Number(n || 0).toLocaleString("id-ID");
+  const fmtDateTime = (s: string) =>
+    new Date(s).toLocaleString("id-ID", {
+      day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
+    });
 
   useEffect(() => {
     async function load() {
       try {
         const [ordersData, booksData] = await Promise.all([
-          apiFetch<Order[]>("/api/order"),
+          apiFetch<AdminOrder[]>("/api/admin/orders"),
           apiFetch<Book[]>("/api/book"),
         ]);
         setOrders(Array.isArray(ordersData) ? ordersData : []);
@@ -37,12 +54,15 @@ export default function OrdersPage() {
     load();
   }, []);
 
-  const orderColumns: Column<Order>[] = [
+  const orderColumns: Column<AdminOrder>[] = [
     {
-      header: "ID Order",
-      accessor: "id",
+      header: "Pemesan",
+      accessor: "user",
       render: (row) => (
-        <span className="text-text-low text-xs font-mono">{row.id.slice(0, 12)}...</span>
+        <div>
+          <p className="text-text-high text-sm font-medium">{row.user?.name ?? "—"}</p>
+          <p className="text-text-low text-xs">{row.user?.email ?? ""}</p>
+        </div>
       ),
     },
     {
@@ -159,12 +179,6 @@ export default function OrdersPage() {
         </p>
       </div>
 
-      {/* Backend limitation notice */}
-      <div className="p-3 rounded-lg bg-surface-2 border border-gold/15 text-text-med text-xs">
-        ℹ️ Menampilkan order akun admin saat ini. Endpoint admin untuk semua pengguna
-        (<code className="text-gold">/api/admin/orders</code>) belum tersedia di backend.
-      </div>
-
       {error && (
         <div className="p-3 rounded-lg bg-danger/10 border border-danger/25 text-danger text-sm">
           <AlertTriangle size={16} className="inline shrink-0" /> {error}
@@ -173,15 +187,15 @@ export default function OrdersPage() {
 
       {/* ── Summary ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-surface-1 border border-gold/25 rounded-xl p-4 text-center">
+        <div className="bg-surface-1 border border-neutral-200 rounded-xl p-4 text-center">
           <p className="text-text-low text-xs uppercase tracking-wider mb-1">Total Order</p>
           <p className="text-gold text-3xl font-serif font-bold">{orders.length}</p>
         </div>
-        <div className="bg-surface-1 border border-gold/25 rounded-xl p-4 text-center">
+        <div className="bg-surface-1 border border-neutral-200 rounded-xl p-4 text-center">
           <p className="text-text-low text-xs uppercase tracking-wider mb-1">Total Buku</p>
           <p className="text-gold text-3xl font-serif font-bold">{books.length}</p>
         </div>
-        <div className="bg-surface-1 border border-gold/25 rounded-xl p-4 text-center">
+        <div className="bg-surface-1 border border-neutral-200 rounded-xl p-4 text-center">
           <p className="text-text-low text-xs uppercase tracking-wider mb-1">Stok Kritis</p>
           <p className="text-warning text-3xl font-serif font-bold">
             {books.filter((b) => b.stock <= 5).length}
@@ -190,21 +204,22 @@ export default function OrdersPage() {
       </div>
 
       {/* ── Orders table ──────────────────────────────────────────────── */}
-      <div className="bg-surface-1 border border-gold/25 rounded-xl overflow-hidden">
-        <div className="px-5 py-3 border-b border-gold/15">
+      <div className="bg-surface-1 border border-neutral-200 rounded-xl overflow-hidden">
+        <div className="px-5 py-3 border-b border-neutral-200">
           <h2 className="text-text-high font-serif text-lg">Daftar Order</h2>
         </div>
         <DataTable
           columns={orderColumns}
           data={orders}
+          onRowClick={setSelected}
           emptyMessage="Belum ada order"
           emptyDescription="Order pembelian buku akan muncul di sini."
         />
       </div>
 
       {/* ── Book catalog table ────────────────────────────────────────── */}
-      <div className="bg-surface-1 border border-gold/25 rounded-xl overflow-hidden">
-        <div className="px-5 py-3 border-b border-gold/15">
+      <div className="bg-surface-1 border border-neutral-200 rounded-xl overflow-hidden">
+        <div className="px-5 py-3 border-b border-neutral-200">
           <h2 className="text-text-high font-serif text-lg">Katalog Buku</h2>
         </div>
         <DataTable
@@ -214,6 +229,42 @@ export default function OrdersPage() {
           emptyDescription="Tambahkan buku melalui backend API."
         />
       </div>
+
+      <DetailModal
+        open={!!selected}
+        title="Detail Order"
+        subtitle={selected?.id}
+        onClose={() => setSelected(null)}
+        rows={
+          selected
+            ? [
+                { label: "Pemesan", value: selected.user?.name ?? "—" },
+                { label: "Email", value: selected.user?.email ?? "—" },
+                { label: "Status", value: <Badge variant={orderStatusVariant(selected.status)}>{selected.status}</Badge> },
+                { label: "Penerima", value: selected.recipientName },
+                { label: "Telepon", value: selected.phone },
+                { label: "Alamat", value: selected.address ?? "—" },
+                { label: "Kode Pos", value: selected.postalCode ?? "—" },
+                { label: "Kurir", value: `${selected.courierName ?? "—"} ${selected.courierService ?? ""}`.trim() },
+                { label: "Ongkir", value: fmtRp(selected.shippingCost ?? 0) },
+                { label: "Total", value: <span className="font-semibold">{fmtRp(selected.totalAmount)}</span> },
+                {
+                  label: "Item",
+                  value: selected.items && selected.items.length
+                    ? (
+                      <div className="space-y-0.5">
+                        {selected.items.map((it, i) => (
+                          <p key={i}>{it.book?.title ?? "Buku"} × {it.quantity}</p>
+                        ))}
+                      </div>
+                    )
+                    : "—",
+                },
+                { label: "Tanggal", value: fmtDateTime(selected.createdAt) },
+              ]
+            : []
+        }
+      />
     </div>
   );
 }

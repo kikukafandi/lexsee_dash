@@ -46,7 +46,7 @@ type StatCardProps = {
 
 function StatCard({ label, value, tier }: StatCardProps) {
   return (
-    <div className="bg-surface-1 border border-gold/25 rounded-xl p-5 flex flex-col gap-2">
+    <div className="bg-surface-1 border border-neutral-200 rounded-xl p-5 flex flex-col gap-2">
       <div className="flex items-center justify-between">
         <span className="text-text-med text-sm font-semibold uppercase tracking-wider">
           {label}
@@ -189,7 +189,7 @@ export default function MembershipPage() {
               return (
                 <div
                   key={plan.id}
-                  className={`bg-surface-1 border rounded-xl p-5 flex flex-col gap-3 transition-all ${plan.isActive ? 'border-gold/25' : 'border-base-content/10 opacity-60'}`}
+                  className={`bg-surface-1 border rounded-xl p-5 flex flex-col gap-3 transition-all ${plan.isActive ? 'border-neutral-200' : 'border-base-content/10 opacity-60'}`}
                 >
                   {/* Plan header */}
                   <div className="flex items-start justify-between gap-2">
@@ -227,7 +227,7 @@ export default function MembershipPage() {
 
                   {/* Features */}
                   {featuresArray.length > 0 && (
-                    <ul className="space-y-1 mt-2 border-t border-gold/10 pt-3">
+                    <ul className="space-y-1 mt-2 border-t border-neutral-100 pt-3">
                       {featuresArray.map((feature: any, idx) => {
                         const name = typeof feature === "string" ? feature : feature.name;
                         const isIncluded = typeof feature === "string" ? true : feature.included !== false;
@@ -244,8 +244,8 @@ export default function MembershipPage() {
                   )}
 
                   {/* Admin Actions */}
-                  <div className="mt-auto pt-4 border-t border-gold/10 flex items-center justify-end gap-2">
-                     <button onClick={() => handleOpenForm(plan)} className="btn btn-ghost btn-sm text-text-med hover:bg-gold/10 hover:text-gold">
+                  <div className="mt-auto pt-4 border-t border-neutral-100 flex items-center justify-end gap-2">
+                     <button onClick={() => handleOpenForm(plan)} className="btn btn-ghost btn-sm text-text-med hover:bg-neutral-100 hover:text-gold">
                        <Edit size={14} />
                        Edit
                      </button>
@@ -264,10 +264,10 @@ export default function MembershipPage() {
       {/* ── Pricing tier reference table ─────────────────────────────────── */}
       <section>
         <h2 className="text-2xl font-serif text-text-high mb-4">Referensi Harga Tier</h2>
-        <div className="bg-surface-1 border border-gold/25 rounded-xl overflow-hidden">
+        <div className="bg-surface-1 border border-neutral-200 rounded-xl overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gold/15">
+              <tr className="border-b border-neutral-200">
                 <th className="text-left text-text-med text-sm font-semibold uppercase tracking-wider px-5 py-3">
                   Tier
                 </th>

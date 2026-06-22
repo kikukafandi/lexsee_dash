@@ -18,6 +18,7 @@ import {
 import { apiFetch } from "@/lib/api";
 import { Sparkline } from "@/components/ui/Sparkline";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { OnlineUsersCard } from "@/components/features/overview/OnlineUsersCard";
 import type { KbStats, Payment, MembershipPlan, AdminUsersResponse } from "@/types";
 
 // ─── Helper: get time-of-day greeting ──────────────────────────────────────
@@ -71,10 +72,10 @@ function KpiCard({
   value,
   subtext,
   sparkData,
-  accentColor = "#C9A84C",
+  accentColor = "#C0162C",
 }: KpiCardProps) {
   return (
-    <div className="bg-surface-1 border border-gold/25 rounded-xl p-5 flex flex-col gap-3">
+    <div className="bg-surface-1 border border-neutral-200 rounded-xl p-5 flex flex-col gap-3">
       <p className="text-text-low text-xs font-semibold uppercase tracking-wider">
         {label}
       </p>
@@ -103,7 +104,7 @@ export default function OverviewPage() {
         // Fetch all data in parallel for faster loading
         const [statsData, paymentsData, plansData, usersData] = await Promise.all([
           apiFetch<KbStats>("/api/legal/admin/stats"),
-          apiFetch<Payment[]>("/api/payment/history"),
+          apiFetch<Payment[]>("/api/admin/payments"),
           apiFetch<MembershipPlan[]>("/api/membership-plans"),
           apiFetch<AdminUsersResponse>("/api/admin/users"),
         ]);
@@ -167,7 +168,7 @@ export default function OverviewPage() {
           </p>
         </div>
         {/* System status indicator */}
-        <div className="flex items-center gap-2 text-xs text-text-med bg-surface-2 px-3 py-1.5 rounded-full border border-gold/15">
+        <div className="flex items-center gap-2 text-xs text-text-med bg-surface-2 px-3 py-1.5 rounded-full border border-neutral-200">
           <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
           Sistem normal
         </div>
@@ -193,14 +194,14 @@ export default function OverviewPage() {
           value={stats?.sessions ?? 0}
           subtext="Total sesi chat AI"
           sparkData={[10, 15, 12, 20, 18, 25, stats?.sessions ?? 0]}
-          accentColor="#E2C97E"
+          accentColor="#D6324A"
         />
         <KpiCard
           label="Vector Embedding"
           value={stats?.chunks ?? 0}
           subtext="Chunks di knowledge base"
           sparkData={[50, 80, 120, 160, 200, stats?.chunks ?? 0]}
-          accentColor="#9A7E38"
+          accentColor="#9E0F22"
         />
         <KpiCard
           label="Tingkat Kepuasan AI"
@@ -214,7 +215,7 @@ export default function OverviewPage() {
       {/* ── Chart + Activity section ──────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Payment area chart (takes 2/3 width on large screens) */}
-        <div className="lg:col-span-2 bg-surface-1 border border-gold/25 rounded-xl p-5">
+        <div className="lg:col-span-2 bg-surface-1 border border-neutral-200 rounded-xl p-5">
           <p className="text-text-low text-xs uppercase tracking-wider mb-1">
             RIWAYAT PEMBAYARAN
           </p>
@@ -235,54 +236,48 @@ export default function OverviewPage() {
           ) : (
             <ResponsiveContainer width="100%" height={200}>
               <AreaChart data={chartData}>
-                <defs>
-                  {/* Gold gradient fill for successful payments */}
-                  <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#C9A84C" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#C9A84C" stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  stroke="rgba(201,168,76,0.1)"
+                  stroke="rgba(0,0,0,0.06)"
                 />
                 <XAxis
                   dataKey="month"
-                  tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }}
+                  tick={{ fill: "rgba(70,60,50,0.5)", fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <YAxis
-                  tick={{ fill: "rgba(255,255,255,0.4)", fontSize: 11 }}
+                  tick={{ fill: "rgba(70,60,50,0.5)", fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`}
                 />
                 <Tooltip
                   contentStyle={{
-                    background: "#2A0909",
-                    border: "1px solid rgba(201,168,76,0.25)",
+                    background: "#FFFFFF",
+                    border: "1px solid #EADFD9",
                     borderRadius: "8px",
                     fontSize: "12px",
                   }}
-                  labelStyle={{ color: "#E2C97E", fontWeight: "bold" }}
+                  labelStyle={{ color: "#1E1E1E", fontWeight: "bold" }}
                   formatter={(value: number) => [
                     `Rp ${value.toLocaleString("id-ID")}`,
                   ]}
                 />
+                {/* Solid merah (tanpa gradient) */}
                 <Area
                   type="monotone"
                   dataKey="sukses"
-                  stroke="#C9A84C"
-                  fill="url(#goldGrad)"
+                  stroke="#C0162C"
+                  fill="rgba(192,22,44,0.12)"
                   strokeWidth={2}
                   name="Berhasil"
                 />
                 <Area
                   type="monotone"
                   dataKey="pending"
-                  stroke="#5C0A0A"
-                  fill="rgba(92,10,10,0.2)"
+                  stroke="#9A9A9A"
+                  fill="rgba(154,154,154,0.15)"
                   strokeWidth={2}
                   name="Pending"
                 />
@@ -292,7 +287,7 @@ export default function OverviewPage() {
         </div>
 
         {/* Feedback breakdown (1/3 width) */}
-        <div className="bg-surface-1 border border-gold/25 rounded-xl p-5">
+        <div className="bg-surface-1 border border-neutral-200 rounded-xl p-5">
           <p className="text-text-low text-xs uppercase tracking-wider mb-1">
             FEEDBACK AI
           </p>
@@ -333,7 +328,7 @@ export default function OverviewPage() {
               </div>
             </div>
 
-            <div className="border-t border-gold/10 pt-4">
+            <div className="border-t border-neutral-100 pt-4">
               <p className="text-text-low text-xs">Total feedback</p>
               <p className="text-gold text-2xl font-serif font-bold mt-1">
                 {(stats?.feedback.helpful ?? 0) +
@@ -342,6 +337,11 @@ export default function OverviewPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* ── Pengguna online (real-time) ──────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <OnlineUsersCard />
       </div>
 
       {/* ── Membership Plans summary ─────────────────────────────────── */}
@@ -358,12 +358,12 @@ export default function OverviewPage() {
                   key={plan.id}
                   className={`bg-surface-1 border rounded-xl p-4 ${
                     plan.isPopular
-                      ? "border-gold/50 shadow-lg shadow-gold/10"
-                      : "border-gold/20"
+                      ? "border-maroon shadow-sm"
+                      : "border-neutral-200"
                   }`}
                 >
                   {plan.isPopular && (
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-gold bg-gold/10 px-2 py-0.5 rounded-full border border-gold/20 mb-2 inline-block">
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-gold bg-gold/10 px-2 py-0.5 rounded-full border border-neutral-200 mb-2 inline-block">
                       Populer
                     </span>
                   )}
@@ -387,7 +387,7 @@ export default function OverviewPage() {
             Distribusi Pengguna
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="bg-surface-1 border border-gold/25 rounded-xl p-5">
+            <div className="bg-surface-1 border border-neutral-200 rounded-xl p-5">
               <p className="text-text-low text-xs font-semibold uppercase tracking-wider mb-2">
                 Total Pengguna Terdaftar
               </p>
@@ -400,7 +400,7 @@ export default function OverviewPage() {
                 {userStats.summary.byMembership["FREE"] ?? 0} free
               </p>
             </div>
-            <div className="bg-surface-1 border border-gold/25 rounded-xl p-5">
+            <div className="bg-surface-1 border border-neutral-200 rounded-xl p-5">
               <p className="text-text-low text-xs font-semibold uppercase tracking-wider mb-4">
                 Breakdown per Tier
               </p>

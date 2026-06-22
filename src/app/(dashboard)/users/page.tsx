@@ -165,7 +165,7 @@ export default function UsersPage() {
       {/* ── Stat cards ────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total */}
-        <div className="bg-surface-1 border border-gold/25 rounded-xl p-5">
+        <div className="bg-surface-1 border border-neutral-200 rounded-xl p-5">
           <p className="text-text-low text-xs uppercase tracking-wider mb-1">
             Total Pengguna
           </p>
@@ -175,7 +175,7 @@ export default function UsersPage() {
         </div>
 
         {/* Subscribed */}
-        <div className="bg-surface-1 border border-gold/25 rounded-xl p-5">
+        <div className="bg-surface-1 border border-neutral-200 rounded-xl p-5">
           <p className="text-text-low text-xs uppercase tracking-wider mb-1">
             Berlangganan
           </p>
@@ -185,7 +185,7 @@ export default function UsersPage() {
         </div>
 
         {/* Free */}
-        <div className="bg-surface-1 border border-gold/25 rounded-xl p-5">
+        <div className="bg-surface-1 border border-neutral-200 rounded-xl p-5">
           <p className="text-text-low text-xs uppercase tracking-wider mb-1">
             Free
           </p>
@@ -195,7 +195,7 @@ export default function UsersPage() {
         </div>
 
         {/* Admin */}
-        <div className="bg-surface-1 border border-gold/25 rounded-xl p-5">
+        <div className="bg-surface-1 border border-neutral-200 rounded-xl p-5">
           <p className="text-text-low text-xs uppercase tracking-wider mb-1">
             Admin
           </p>
@@ -206,23 +206,23 @@ export default function UsersPage() {
       </div>
 
       {/* ── Table card ────────────────────────────────────────────────────── */}
-      <div className="bg-surface-1 border border-gold/25 rounded-xl">
+      <div className="bg-surface-1 border border-neutral-200 rounded-xl">
         {/* Controls */}
-        <div className="flex flex-col sm:flex-row gap-3 p-5 border-b border-gold/15">
+        <div className="flex flex-col sm:flex-row gap-3 p-5 border-b border-neutral-200">
           {/* Search */}
           <input
             type="text"
             placeholder="Cari nama atau email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60"
+            className="flex-1 bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
           />
 
           {/* Tier filter */}
           <select
             value={tierFilter}
             onChange={(e) => setTierFilter(e.target.value as MembershipFilter)}
-            className="bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60"
+            className="bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
           >
             <option value="ALL">Semua Tier</option>
             <option value="FREE">FREE</option>
@@ -233,7 +233,7 @@ export default function UsersPage() {
         </div>
 
         {/* Filtered count */}
-        <div className="px-5 py-2 border-b border-gold/10">
+        <div className="px-5 py-2 border-b border-neutral-100">
           <p className="text-text-low text-xs">
             Menampilkan{" "}
             <span className="text-text-med font-semibold">

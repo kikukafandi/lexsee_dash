@@ -112,7 +112,7 @@ export function PlanForm({ isOpen, onClose, onSuccess, plan }: PlanFormProps) {
             <label className="text-sm font-medium text-text-high">Nama Plan</label>
             <input 
               {...register("name")} 
-              className="w-full bg-surface-2 border border-gold/15 rounded-lg px-3 py-2 text-sm text-text-high focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/50 transition-colors placeholder:text-text-low/50"
+              className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-sm text-text-high focus:outline-none focus:border-maroon focus:ring-1 focus:ring-gold/50 transition-colors placeholder:text-text-low/50"
               placeholder="e.g. Premium"
             />
             {errors.name && <p className="text-xs text-danger">{errors.name.message}</p>}
@@ -123,7 +123,7 @@ export function PlanForm({ isOpen, onClose, onSuccess, plan }: PlanFormProps) {
             <label className="text-sm font-medium text-text-high">Durasi</label>
             <select 
               {...register("duration")} 
-              className="w-full bg-surface-2 border border-gold/15 rounded-lg px-3 py-2 text-sm text-text-high focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/50 transition-colors"
+              className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-sm text-text-high focus:outline-none focus:border-maroon focus:ring-1 focus:ring-gold/50 transition-colors"
             >
               <option value="MONTHLY">Bulanan (Monthly)</option>
               <option value="YEARLY">Tahunan (Yearly)</option>
@@ -136,7 +136,7 @@ export function PlanForm({ isOpen, onClose, onSuccess, plan }: PlanFormProps) {
             <input 
               type="number" 
               {...register("price")} 
-              className="w-full bg-surface-2 border border-gold/15 rounded-lg px-3 py-2 text-sm text-text-high focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/50 transition-colors placeholder:text-text-low/50"
+              className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-sm text-text-high focus:outline-none focus:border-maroon focus:ring-1 focus:ring-gold/50 transition-colors placeholder:text-text-low/50"
               placeholder="0"
             />
             {errors.price && <p className="text-xs text-danger">{errors.price.message}</p>}
@@ -148,7 +148,7 @@ export function PlanForm({ isOpen, onClose, onSuccess, plan }: PlanFormProps) {
             <input 
               type="number" 
               {...register("originalPrice")} 
-              className="w-full bg-surface-2 border border-gold/15 rounded-lg px-3 py-2 text-sm text-text-high focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/50 transition-colors placeholder:text-text-low/50"
+              className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-sm text-text-high focus:outline-none focus:border-maroon focus:ring-1 focus:ring-gold/50 transition-colors placeholder:text-text-low/50"
               placeholder="Kosongkan jika tidak ada diskon"
             />
             {errors.originalPrice && <p className="text-xs text-danger">{errors.originalPrice.message}</p>}
@@ -160,7 +160,7 @@ export function PlanForm({ isOpen, onClose, onSuccess, plan }: PlanFormProps) {
           <label className="text-sm font-medium text-text-high">Deskripsi Singkat (Opsional)</label>
           <textarea 
             {...register("description")} 
-            className="w-full bg-surface-2 border border-gold/15 rounded-lg px-3 py-2 text-sm text-text-high focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/50 transition-colors placeholder:text-text-low/50 resize-none" 
+            className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-sm text-text-high focus:outline-none focus:border-maroon focus:ring-1 focus:ring-gold/50 transition-colors placeholder:text-text-low/50 resize-none" 
             rows={2}
             placeholder="Tambahkan sedikit penjelasan mengenai plan ini..."
           ></textarea>
@@ -171,7 +171,7 @@ export function PlanForm({ isOpen, onClose, onSuccess, plan }: PlanFormProps) {
           <label className="text-sm font-medium text-text-high">Fitur (1 fitur per baris)</label>
           <textarea 
             {...register("features")} 
-            className="w-full bg-surface-2 border border-gold/15 rounded-lg px-3 py-2 text-sm text-text-high focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/50 transition-colors placeholder:text-text-low/50" 
+            className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-sm text-text-high focus:outline-none focus:border-maroon focus:ring-1 focus:ring-gold/50 transition-colors placeholder:text-text-low/50" 
             rows={5}
             placeholder="Akses semua fitur&#10;Analisis prioritas&#10;Support 24/7"
           ></textarea>
@@ -179,13 +179,13 @@ export function PlanForm({ isOpen, onClose, onSuccess, plan }: PlanFormProps) {
         </div>
 
         {/* Toggles */}
-        <div className="mt-6 p-4 rounded-lg bg-surface-2 border border-gold/10 flex flex-col sm:flex-row gap-6">
+        <div className="mt-6 p-4 rounded-lg bg-surface-2 border border-neutral-100 flex flex-col sm:flex-row gap-6">
           <label className="flex items-center gap-3 cursor-pointer group">
             <div className="relative flex items-center">
               <input 
                 type="checkbox" 
                 {...register("isPopular")} 
-                className="peer shrink-0 w-5 h-5 border-2 border-gold/30 rounded focus:outline-none focus:ring-2 focus:ring-gold/20 focus:ring-offset-0 bg-transparent checked:bg-gold checked:border-gold appearance-none transition-colors" 
+                className="peer shrink-0 w-5 h-5 border-2 border-neutral-300 rounded focus:outline-none focus:ring-2 focus:ring-gold/20 focus:ring-offset-0 bg-transparent checked:bg-gold checked:border-gold appearance-none transition-colors" 
               />
               <svg className="absolute left-[3px] top-[3px] w-3.5 h-3.5 text-surface-1 pointer-events-none opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -204,7 +204,7 @@ export function PlanForm({ isOpen, onClose, onSuccess, plan }: PlanFormProps) {
               <input 
                 type="checkbox" 
                 {...register("isActive")} 
-                className="peer shrink-0 w-5 h-5 border-2 border-gold/30 rounded focus:outline-none focus:ring-2 focus:ring-gold/20 focus:ring-offset-0 bg-transparent checked:bg-gold checked:border-gold appearance-none transition-colors" 
+                className="peer shrink-0 w-5 h-5 border-2 border-neutral-300 rounded focus:outline-none focus:ring-2 focus:ring-gold/20 focus:ring-offset-0 bg-transparent checked:bg-gold checked:border-gold appearance-none transition-colors" 
               />
               <svg className="absolute left-[3px] top-[3px] w-3.5 h-3.5 text-surface-1 pointer-events-none opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
@@ -218,11 +218,11 @@ export function PlanForm({ isOpen, onClose, onSuccess, plan }: PlanFormProps) {
         </div>
 
         {/* Actions */}
-        <div className="mt-8 pt-4 border-t border-gold/10 flex flex-col-reverse sm:flex-row justify-end gap-3">
-          <button type="button" onClick={handleClose} className="px-4 py-2 rounded-lg text-sm font-medium text-text-med bg-surface-2 border border-gold/20 hover:bg-gold/10 hover:text-gold transition-colors">
+        <div className="mt-8 pt-4 border-t border-neutral-100 flex flex-col-reverse sm:flex-row justify-end gap-3">
+          <button type="button" onClick={handleClose} className="px-4 py-2 rounded-lg text-sm font-medium text-text-med bg-surface-2 border border-neutral-200 hover:bg-neutral-100 hover:text-gold transition-colors">
             Kembali
           </button>
-          <button type="submit" disabled={isSubmitting} className="px-4 py-2 rounded-lg text-sm font-medium text-surface-1 bg-gold hover:bg-gold/90 transition-colors disabled:opacity-50 min-w-[140px] flex items-center justify-center">
+          <button type="submit" disabled={isSubmitting} className="px-4 py-2 rounded-lg text-sm font-medium text-surface-1 bg-gold hover:bg-maroon-dark transition-colors disabled:opacity-50 min-w-[140px] flex items-center justify-center">
             {isSubmitting ? <LoadingSpinner size="sm" /> : (isEditMode ? "Simpan Perubahan" : "Buat Plan")}
           </button>
         </div>

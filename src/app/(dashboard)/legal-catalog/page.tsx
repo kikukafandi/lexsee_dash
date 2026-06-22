@@ -162,7 +162,7 @@ export default function LegalCatalogPage() {
         <button
           onClick={handleSync}
           disabled={syncing}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {syncing ? (
             <>
@@ -187,13 +187,13 @@ export default function LegalCatalogPage() {
         </div>
       )}
       {syncing && (
-        <div className="p-3 rounded-lg bg-surface-2 border border-gold/15 text-text-med text-sm flex items-center gap-2">
+        <div className="p-3 rounded-lg bg-surface-2 border border-neutral-200 text-text-med text-sm flex items-center gap-2">
           <Hourglass size={16} className="shrink-0" /> Proses sync sedang berjalan (3–10 menit). Jangan tutup tab ini.
         </div>
       )}
 
       {/* ── Filters ──────────────────────────────────────────────────── */}
-      <div className="bg-surface-1 border border-gold/25 rounded-xl p-4">
+      <div className="bg-surface-1 border border-neutral-200 rounded-xl p-4">
         <div className="flex flex-wrap gap-3 items-end">
           {/* Text search */}
           <div className="flex-1 min-w-48">
@@ -206,7 +206,7 @@ export default function LegalCatalogPage() {
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && load(1)}
               placeholder="Ketik judul..."
-              className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 transition-colors"
+              className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon transition-colors"
             />
           </div>
 
@@ -218,7 +218,7 @@ export default function LegalCatalogPage() {
             <select
               value={jenis}
               onChange={(e) => setJenis(e.target.value)}
-              className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 transition-colors"
+              className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon transition-colors"
             >
               <option value="">Semua</option>
               <option value="UU">UU</option>
@@ -242,7 +242,7 @@ export default function LegalCatalogPage() {
               onChange={(e) => setTahun(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && load(1)}
               placeholder="2024"
-              className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 transition-colors"
+              className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon transition-colors"
             />
           </div>
 
@@ -250,7 +250,7 @@ export default function LegalCatalogPage() {
           <div className="flex gap-2">
             <button
               onClick={() => load(1)}
-              className="px-4 py-2 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors"
+              className="px-4 py-2 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors"
             >
               Cari
             </button>
@@ -260,7 +260,7 @@ export default function LegalCatalogPage() {
                 setJenis("");
                 setTahun("");
               }}
-              className="px-4 py-2 rounded-lg bg-surface-2 text-text-med text-sm border border-gold/20 hover:text-text-high transition-colors"
+              className="px-4 py-2 rounded-lg bg-surface-2 text-text-med text-sm border border-neutral-200 hover:text-text-high transition-colors"
             >
               Reset
             </button>
@@ -269,7 +269,7 @@ export default function LegalCatalogPage() {
       </div>
 
       {/* ── Data table ───────────────────────────────────────────────── */}
-      <div className="bg-surface-1 border border-gold/25 rounded-xl overflow-hidden">
+      <div className="bg-surface-1 border border-neutral-200 rounded-xl overflow-hidden">
         <DataTable
           columns={columnsWithAction}
           data={data}

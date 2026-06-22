@@ -21,9 +21,9 @@ const VARIANT_CLASSES: Record<BadgeVariant, string> = {
   success: "bg-success/15 text-success border border-success/30",
   danger: "bg-danger/15 text-danger border border-danger/30",
   warning: "bg-warning/15 text-warning border border-warning/30",
-  info: "bg-blue-500/15 text-blue-300 border border-blue-500/30",
-  gold: "bg-gold/15 text-gold border border-gold/30",
-  default: "bg-surface-2 text-text-med border border-gold/15",
+  info: "bg-blue-500/15 text-blue-600 border border-blue-500/30",
+  gold: "bg-gold/15 text-gold border border-neutral-300",
+  default: "bg-surface-2 text-text-med border border-neutral-200",
 };
 
 export function Badge({

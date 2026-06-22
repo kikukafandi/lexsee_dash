@@ -104,7 +104,7 @@ function PushNotifTester() {
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60"
+              className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
             />
           </div>
           <div>
@@ -113,7 +113,7 @@ function PushNotifTester() {
               value={body}
               onChange={(e) => setBody(e.target.value)}
               rows={3}
-              className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 resize-y"
+              className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
             />
           </div>
           <div>
@@ -122,7 +122,7 @@ function PushNotifTester() {
               value={selectedUserId}
               onChange={(e) => setSelectedUserId(e.target.value)}
               disabled={usersLoading || !!fcmToken.trim()}
-              className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 disabled:opacity-50"
+              className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon disabled:opacity-50"
             >
               <option value="">Broadcast (semua pengguna)</option>
               {users.map((u) => (
@@ -141,14 +141,14 @@ function PushNotifTester() {
               value={fcmToken}
               onChange={(e) => setFcmToken(e.target.value)}
               placeholder="AAAAxxxxx... (FCM device token)"
-              className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 font-mono"
+              className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon font-mono"
             />
             <p className="text-text-low text-xs mt-1">Jika diisi, akan override pilihan pengguna di atas.</p>
           </div>
           <button
             onClick={send}
             disabled={sending}
-            className="w-full py-2.5 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {sending ? <><LoadingSpinner size="sm" /> Mengirim...</> : "Kirim Notifikasi Test"}
           </button>
@@ -157,13 +157,13 @@ function PushNotifTester() {
         <div className="space-y-4">
           <div>
             <p className="text-text-low text-xs uppercase tracking-wider mb-2">Preview Payload (JSON)</p>
-            <pre className="bg-surface-2 border border-gold/15 rounded-lg p-3 text-xs text-gold font-mono overflow-x-auto whitespace-pre-wrap">
+            <pre className="bg-surface-2 border border-neutral-200 rounded-lg p-3 text-xs text-gold font-mono overflow-x-auto whitespace-pre-wrap">
               {JSON.stringify(payload, null, 2)}
             </pre>
           </div>
           <div>
             <p className="text-text-low text-xs uppercase tracking-wider mb-1">Target Saat Ini</p>
-            <p className="text-text-high text-sm bg-surface-2 border border-gold/15 rounded-lg px-3 py-2">
+            <p className="text-text-high text-sm bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2">
               {effectiveTarget}
             </p>
           </div>
@@ -249,12 +249,12 @@ function QuickChat() {
         onKeyDown={(e) => { if (e.key === "Enter" && e.ctrlKey) send(); }}
         rows={3}
         placeholder="Tanyakan masalah hukum... (Ctrl+Enter untuk kirim)"
-        className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 resize-y"
+        className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
       />
       <button
         onClick={send}
         disabled={loading || !msg.trim()}
-        className="w-full py-2.5 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {loading ? <><LoadingSpinner size="sm" /> AI memproses...</> : <><Send size={14} /> Tanya AI Lexsy</>}
       </button>
@@ -263,7 +263,7 @@ function QuickChat() {
 
       {res && (
         <div className="space-y-3">
-          <div className="p-4 rounded-xl bg-surface-2 border border-gold/15">
+          <div className="p-4 rounded-xl bg-surface-2 border border-neutral-200">
             <p className="text-text-low text-xs uppercase tracking-wider mb-2">Jawaban AI</p>
             <MarkdownRenderer content={res.answer} />
           </div>
@@ -286,12 +286,12 @@ function QuickChat() {
           )}
 
           {res.sources?.length > 0 && (
-            <div className="p-3 rounded-xl bg-surface-2 border border-gold/10">
+            <div className="p-3 rounded-xl bg-surface-2 border border-neutral-100">
               <p className="text-text-low text-xs uppercase tracking-wider mb-2 flex items-center gap-1">
                 <BookOpen size={12} /> Referensi ({res.sources.length})
               </p>
               {res.sources.map((s, i) => (
-                <div key={i} className="py-2 border-b border-gold/10 last:border-0">
+                <div key={i} className="py-2 border-b border-neutral-100 last:border-0">
                   <p className="text-text-high text-xs font-medium">{i + 1}. {s.title}</p>
                   <p className="text-text-low text-xs mt-0.5">{s.excerpt?.slice(0, 120)}...</p>
                 </div>
@@ -403,7 +403,7 @@ function ConversationChat() {
         <button
           onClick={startSession}
           disabled={starting}
-          className="px-6 py-2.5 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center gap-2"
+          className="px-6 py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center gap-2"
         >
           {starting ? <><LoadingSpinner size="sm" /> Membuat sesi...</> : <><Plus size={14} /> Mulai Percakapan Baru</>}
         </button>
@@ -435,8 +435,8 @@ function ConversationChat() {
             <div
               className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm ${
                 b.role === "user"
-                  ? "bg-gold text-maroon-deep rounded-br-sm"
-                  : "bg-surface-2 border border-gold/15 text-text-high rounded-bl-sm"
+                  ? "bg-gold text-white rounded-br-sm"
+                  : "bg-surface-2 border border-neutral-200 text-text-high rounded-bl-sm"
               }`}
             >
               {b.role === "user" ? (
@@ -454,9 +454,9 @@ function ConversationChat() {
                     <summary className="text-text-low cursor-pointer hover:text-text-med flex items-center gap-1 list-none select-none">
                       <BookOpen size={11} /> {b.sources.length} referensi · {b.retrievedDocs} dokumen dianalisa
                     </summary>
-                    <div className="mt-1.5 bg-surface-2 border border-gold/10 rounded-lg p-2 space-y-1.5">
+                    <div className="mt-1.5 bg-surface-2 border border-neutral-100 rounded-lg p-2 space-y-1.5">
                       {b.sources.map((s, i) => (
-                        <div key={i} className="py-1 border-b border-gold/10 last:border-0">
+                        <div key={i} className="py-1 border-b border-neutral-100 last:border-0">
                           <p className="text-text-high font-medium">{i + 1}. {s.title}</p>
                           <p className="text-text-low mt-0.5">{s.excerpt?.slice(0, 120)}...</p>
                         </div>
@@ -488,7 +488,7 @@ function ConversationChat() {
 
         {loading && (
           <div className="flex items-start">
-            <div className="bg-surface-2 border border-gold/15 rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-2 text-text-low text-sm">
+            <div className="bg-surface-2 border border-neutral-200 rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-2 text-text-low text-sm">
               <LoadingSpinner size="sm" /> AI sedang berpikir...
             </div>
           </div>
@@ -500,7 +500,7 @@ function ConversationChat() {
       {error && <div className="p-3 rounded-lg bg-danger/10 border border-danger/25 text-danger text-sm">{error}</div>}
 
       {/* Input area */}
-      <div className="flex gap-2 pt-1 border-t border-gold/10">
+      <div className="flex gap-2 pt-1 border-t border-neutral-100">
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -508,12 +508,12 @@ function ConversationChat() {
           rows={2}
           disabled={loading}
           placeholder="Tulis pesan... (Enter kirim, Shift+Enter baris baru)"
-          className="flex-1 bg-surface-2 border border-gold/25 rounded-xl px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 resize-none disabled:opacity-50"
+          className="flex-1 bg-surface-2 border border-neutral-200 rounded-xl px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-none disabled:opacity-50"
         />
         <button
           onClick={send}
           disabled={loading || !input.trim()}
-          className="px-4 rounded-xl bg-gold text-maroon-deep hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center"
+          className="px-4 rounded-xl bg-gold text-white hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center"
         >
           <Send size={16} />
         </button>
@@ -567,7 +567,7 @@ function GenerateDoc() {
         <select
           value={docType}
           onChange={(e) => setDocType(e.target.value)}
-          className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60"
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
         >
           {DOC_TYPES.map((dt) => (
             <option key={dt.value} value={dt.value}>{dt.label}</option>
@@ -581,7 +581,7 @@ function GenerateDoc() {
           <input
             value={docVars[key] ?? ""}
             onChange={(e) => setDocVars((prev) => ({ ...prev, [key]: e.target.value }))}
-            className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60"
+            className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
           />
         </div>
       ))}
@@ -589,7 +589,7 @@ function GenerateDoc() {
       <button
         onClick={generateDoc}
         disabled={docLoading}
-        className="w-full py-2.5 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {docLoading ? <><LoadingSpinner size="sm" /> Membuat dokumen...</> : "Generate Dokumen"}
       </button>
@@ -599,7 +599,7 @@ function GenerateDoc() {
       )}
 
       {docResult && (
-        <div className="bg-surface-2 border border-gold/15 rounded-lg px-4 py-3">
+        <div className="bg-surface-2 border border-neutral-200 rounded-lg px-4 py-3">
           <MarkdownRenderer content={docResult} />
         </div>
       )}
@@ -645,7 +645,7 @@ function LegalOpinionTester() {
           onChange={(e) => setQuestion(e.target.value)}
           rows={4}
           placeholder="Contoh: PT A tidak membayar gaji karyawan selama 3 bulan. Apa dasar hukum dan sanksinya?"
-          className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 resize-y"
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
         />
       </div>
       <div>
@@ -654,20 +654,20 @@ function LegalOpinionTester() {
           value={domain}
           onChange={(e) => setDomain(e.target.value)}
           placeholder="ketenagakerjaan / perdata / pidana / bisnis"
-          className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60"
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
         />
       </div>
       <button
         onClick={run}
         disabled={loading || !question.trim()}
-        className="w-full py-2.5 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {loading ? <><LoadingSpinner size="sm" /> Membuat Legal Opinion...</> : "Generate Legal Opinion"}
       </button>
       {error && <div className="p-3 rounded-lg bg-danger/10 border border-danger/25 text-danger text-sm">{error}</div>}
       {result && (
         <div className="space-y-3">
-          <div className="p-4 rounded-xl bg-surface-2 border border-gold/15">
+          <div className="p-4 rounded-xl bg-surface-2 border border-neutral-200">
             <p className="text-text-low text-xs uppercase tracking-wider mb-2">Legal Opinion</p>
             <MarkdownRenderer content={result.opinion} />
           </div>
@@ -676,9 +676,9 @@ function LegalOpinionTester() {
               <summary className="text-text-low cursor-pointer hover:text-text-med flex items-center gap-1 list-none">
                 <BookOpen size={12} /> {result.sources.length} referensi · {result.retrievedDocs} dokumen dianalisa
               </summary>
-              <div className="mt-2 bg-surface-2 border border-gold/10 rounded-lg p-2 space-y-1.5">
+              <div className="mt-2 bg-surface-2 border border-neutral-100 rounded-lg p-2 space-y-1.5">
                 {result.sources.map((s, i) => (
-                  <div key={i} className="py-1 border-b border-gold/10 last:border-0">
+                  <div key={i} className="py-1 border-b border-neutral-100 last:border-0">
                     <p className="text-text-high font-medium">{i + 1}. {s.title}</p>
                     <p className="text-text-low mt-0.5">{s.excerpt?.slice(0, 120)}...</p>
                   </div>
@@ -729,7 +729,7 @@ function SummarizeTester() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Contoh: UU No. 13 Tahun 2003 tentang Ketenagakerjaan"
-          className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60"
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
         />
       </div>
       <div>
@@ -739,19 +739,19 @@ function SummarizeTester() {
           onChange={(e) => setText(e.target.value)}
           rows={6}
           placeholder="Paste teks peraturan / undang-undang di sini..."
-          className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 resize-y"
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
         />
       </div>
       <button
         onClick={run}
         disabled={loading || !text.trim()}
-        className="w-full py-2.5 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {loading ? <><LoadingSpinner size="sm" /> Merangkum...</> : "Buat Executive Summary"}
       </button>
       {error && <div className="p-3 rounded-lg bg-danger/10 border border-danger/25 text-danger text-sm">{error}</div>}
       {result && (
-        <div className="p-4 rounded-xl bg-surface-2 border border-gold/15">
+        <div className="p-4 rounded-xl bg-surface-2 border border-neutral-200">
           <p className="text-text-low text-xs uppercase tracking-wider mb-2">Executive Summary · {result.title}</p>
           <MarkdownRenderer content={result.summary} />
         </div>
@@ -799,7 +799,7 @@ function CompareTester() {
             onChange={(e) => setDocA(e.target.value)}
             rows={6}
             placeholder="Paste teks putusan / dokumen pertama..."
-            className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 resize-y"
+            className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
           />
         </div>
         <div>
@@ -809,20 +809,20 @@ function CompareTester() {
             onChange={(e) => setDocB(e.target.value)}
             rows={6}
             placeholder="Paste teks putusan / dokumen kedua..."
-            className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 resize-y"
+            className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
           />
         </div>
       </div>
       <button
         onClick={run}
         disabled={loading || !docA.trim() || !docB.trim()}
-        className="w-full py-2.5 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {loading ? <><LoadingSpinner size="sm" /> Membandingkan...</> : "Bandingkan Dokumen"}
       </button>
       {error && <div className="p-3 rounded-lg bg-danger/10 border border-danger/25 text-danger text-sm">{error}</div>}
       {result && (
-        <div className="p-4 rounded-xl bg-surface-2 border border-gold/15">
+        <div className="p-4 rounded-xl bg-surface-2 border border-neutral-200">
           <p className="text-text-low text-xs uppercase tracking-wider mb-2">Hasil Perbandingan · {result.retrievedDocs} dok. dianalisa</p>
           <MarkdownRenderer content={result.analysis} />
         </div>
@@ -868,20 +868,20 @@ function VerdictTester() {
           onChange={(e) => setVerdictText(e.target.value)}
           rows={7}
           placeholder="Paste teks lengkap putusan hakim..."
-          className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 resize-y"
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
         />
       </div>
       <button
         onClick={run}
         disabled={loading || !verdictText.trim()}
-        className="w-full py-2.5 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {loading ? <><LoadingSpinner size="sm" /> Menganalisis putusan...</> : "Analisis Putusan"}
       </button>
       {error && <div className="p-3 rounded-lg bg-danger/10 border border-danger/25 text-danger text-sm">{error}</div>}
       {result && (
         <div className="space-y-3">
-          <div className="p-4 rounded-xl bg-surface-2 border border-gold/15">
+          <div className="p-4 rounded-xl bg-surface-2 border border-neutral-200">
             <p className="text-text-low text-xs uppercase tracking-wider mb-2">Hasil Analisis Putusan</p>
             <MarkdownRenderer content={result.analysis} />
           </div>
@@ -890,9 +890,9 @@ function VerdictTester() {
               <summary className="text-text-low cursor-pointer hover:text-text-med flex items-center gap-1 list-none">
                 <BookOpen size={12} /> {result.sources.length} referensi · {result.retrievedDocs} dokumen dianalisa
               </summary>
-              <div className="mt-2 bg-surface-2 border border-gold/10 rounded-lg p-2 space-y-1.5">
+              <div className="mt-2 bg-surface-2 border border-neutral-100 rounded-lg p-2 space-y-1.5">
                 {result.sources.map((s, i) => (
-                  <div key={i} className="py-1 border-b border-gold/10 last:border-0">
+                  <div key={i} className="py-1 border-b border-neutral-100 last:border-0">
                     <p className="text-text-high font-medium">{i + 1}. {s.title}</p>
                     <p className="text-text-low mt-0.5">{s.excerpt?.slice(0, 120)}...</p>
                   </div>
@@ -943,20 +943,20 @@ function ExpertTester() {
           onChange={(e) => setExpertText(e.target.value)}
           rows={7}
           placeholder="Paste teks jurnal atau pendapat ahli hukum..."
-          className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 resize-y"
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
         />
       </div>
       <button
         onClick={run}
         disabled={loading || !expertText.trim()}
-        className="w-full py-2.5 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {loading ? <><LoadingSpinner size="sm" /> Menganalisis...</> : "Analisis Pendapat Ahli"}
       </button>
       {error && <div className="p-3 rounded-lg bg-danger/10 border border-danger/25 text-danger text-sm">{error}</div>}
       {result && (
         <div className="space-y-3">
-          <div className="p-4 rounded-xl bg-surface-2 border border-gold/15">
+          <div className="p-4 rounded-xl bg-surface-2 border border-neutral-200">
             <p className="text-text-low text-xs uppercase tracking-wider mb-2">Hasil Analisis Pendapat Ahli</p>
             <MarkdownRenderer content={result.analysis} />
           </div>
@@ -965,9 +965,9 @@ function ExpertTester() {
               <summary className="text-text-low cursor-pointer hover:text-text-med flex items-center gap-1 list-none">
                 <BookOpen size={12} /> {result.sources.length} referensi · {result.retrievedDocs} dokumen dianalisa
               </summary>
-              <div className="mt-2 bg-surface-2 border border-gold/10 rounded-lg p-2 space-y-1.5">
+              <div className="mt-2 bg-surface-2 border border-neutral-100 rounded-lg p-2 space-y-1.5">
                 {result.sources.map((s, i) => (
-                  <div key={i} className="py-1 border-b border-gold/10 last:border-0">
+                  <div key={i} className="py-1 border-b border-neutral-100 last:border-0">
                     <p className="text-text-high font-medium">{i + 1}. {s.title}</p>
                     <p className="text-text-low mt-0.5">{s.excerpt?.slice(0, 120)}...</p>
                   </div>
@@ -1041,7 +1041,7 @@ function ComplianceTester() {
           onChange={(e) => setRegulationText(e.target.value)}
           rows={5}
           placeholder="Paste teks peraturan yang relevan (UU, PP, Permen, dll.)..."
-          className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 resize-y"
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
         />
       </div>
       <div>
@@ -1051,13 +1051,13 @@ function ComplianceTester() {
           onChange={(e) => setCompanyData(e.target.value)}
           rows={4}
           placeholder="Deskripsikan kondisi, SOP, dan kebijakan perusahaan saat ini..."
-          className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 resize-y"
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
         />
       </div>
       <button
         onClick={run}
         disabled={loading || !regulationText.trim() || !companyData.trim()}
-        className="w-full py-2.5 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {loading ? <><LoadingSpinner size="sm" /> Menganalisis kepatuhan...</> : "Analisis Kepatuhan"}
       </button>
@@ -1077,20 +1077,20 @@ function ComplianceTester() {
               { label: "Risiko", val: result.summary.risk, cls: "text-warning" },
               { label: "Tidak Patuh", val: result.summary.nonCompliant, cls: "text-danger" },
             ].map((item) => (
-              <div key={item.label} className="bg-surface-2 border border-gold/15 rounded-lg py-2">
+              <div key={item.label} className="bg-surface-2 border border-neutral-200 rounded-lg py-2">
                 <p className={`text-xl font-bold ${item.cls}`}>{item.val}</p>
                 <p className="text-text-low text-xs">{item.label}</p>
               </div>
             ))}
           </div>
-          <div className="p-3 bg-surface-2 border border-gold/15 rounded-lg text-sm text-text-med">
+          <div className="p-3 bg-surface-2 border border-neutral-200 rounded-lg text-sm text-text-med">
             {result.summary.kesimpulan}
           </div>
           {result.obligations && result.obligations.length > 0 && (
             <div className="space-y-2">
               <p className="text-text-low text-xs uppercase tracking-wider">Detail Kewajiban</p>
               {result.obligations.map((ob) => (
-                <div key={ob.id} className="p-3 bg-surface-2 border border-gold/10 rounded-lg space-y-1">
+                <div key={ob.id} className="p-3 bg-surface-2 border border-neutral-100 rounded-lg space-y-1">
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-text-high text-sm font-medium flex-1">{ob.kewajiban}</p>
                     <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full border font-semibold ${statusCls(ob.status)}`}>{ob.status}</span>
@@ -1161,7 +1161,7 @@ function AuditTester() {
           value={regulationCategory}
           onChange={(e) => setRegulationCategory(e.target.value)}
           placeholder="Contoh: UU Ketenagakerjaan No. 13 Tahun 2003"
-          className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60"
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
         />
       </div>
       <div>
@@ -1171,13 +1171,13 @@ function AuditTester() {
           onChange={(e) => setDocumentText(e.target.value)}
           rows={7}
           placeholder="Paste teks SOP, perjanjian kerja, laporan, atau kebijakan perusahaan..."
-          className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 resize-y"
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
         />
       </div>
       <button
         onClick={run}
         disabled={loading || !documentText.trim() || !regulationCategory.trim()}
-        className="w-full py-2.5 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {loading ? <><LoadingSpinner size="sm" /> Mengaudit dokumen...</> : "Audit Dokumen"}
       </button>
@@ -1191,7 +1191,7 @@ function AuditTester() {
       {result?.summary && (
         <div className="space-y-3">
           <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="bg-surface-2 border border-gold/15 rounded-lg py-2">
+            <div className="bg-surface-2 border border-neutral-200 rounded-lg py-2">
               <p className="text-xl font-bold text-text-high">{result.summary.totalRedFlags}</p>
               <p className="text-text-low text-xs">Total Red Flags</p>
             </div>
@@ -1204,7 +1204,7 @@ function AuditTester() {
               <p className="text-text-low text-xs">KUNING</p>
             </div>
           </div>
-          <div className="p-3 bg-surface-2 border border-gold/15 rounded-lg text-sm text-text-med">{result.summary.kesimpulan}</div>
+          <div className="p-3 bg-surface-2 border border-neutral-200 rounded-lg text-sm text-text-med">{result.summary.kesimpulan}</div>
           {result.redFlags && result.redFlags.length > 0 && (
             <div className="space-y-2">
               <p className="text-text-low text-xs uppercase tracking-wider">Red Flags</p>
@@ -1293,13 +1293,13 @@ function CitationTester() {
           onChange={(e) => setDocumentText(e.target.value)}
           rows={7}
           placeholder="Paste putusan, kontrak, atau peraturan yang mengandung sitasi hukum..."
-          className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 resize-y"
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
         />
       </div>
       <button
         onClick={run}
         disabled={loading || !documentText.trim()}
-        className="w-full py-2.5 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {loading ? <><LoadingSpinner size="sm" /> Mengekstrak &amp; memverifikasi sitasi...</> : "Cek Sitasi Hukum"}
       </button>
@@ -1307,7 +1307,7 @@ function CitationTester() {
       {result && (
         <div className="space-y-3">
           <div className="grid grid-cols-3 gap-2 text-center">
-            <div className="bg-surface-2 border border-gold/15 rounded-lg py-2">
+            <div className="bg-surface-2 border border-neutral-200 rounded-lg py-2">
               <p className="text-xl font-bold text-text-high">{result.totalSitasiDitemukan}</p>
               <p className="text-text-low text-xs">Diekstrak</p>
             </div>
@@ -1315,7 +1315,7 @@ function CitationTester() {
               <p className="text-xl font-bold text-success">{berlakuCount}</p>
               <p className="text-text-low text-xs">Berlaku</p>
             </div>
-            <div className="bg-surface-2 border border-gold/15 rounded-lg py-2">
+            <div className="bg-surface-2 border border-neutral-200 rounded-lg py-2">
               <p className="text-xl font-bold text-text-med">{result.sitasiDiproses - berlakuCount}</p>
               <p className="text-text-low text-xs">Tidak Ditemukan</p>
             </div>
@@ -1323,10 +1323,10 @@ function CitationTester() {
           {result.results.length > 0 && (
             <div className="space-y-2">
               {result.results.map((r, i) => (
-                <div key={i} className={`p-3 rounded-lg border space-y-1 ${r.status === "BERLAKU" ? "bg-success/5 border-success/25" : "bg-surface-2 border-gold/15"}`}>
+                <div key={i} className={`p-3 rounded-lg border space-y-1 ${r.status === "BERLAKU" ? "bg-success/5 border-success/25" : "bg-surface-2 border-neutral-200"}`}>
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-text-high text-sm font-medium flex-1">{r.teksAsli}</p>
-                    <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full border font-semibold ${r.status === "BERLAKU" ? "text-success border-success/50 bg-success/10" : "text-text-low border-gold/20"}`}>
+                    <span className={`shrink-0 text-xs px-2 py-0.5 rounded-full border font-semibold ${r.status === "BERLAKU" ? "text-success border-success/50 bg-success/10" : "text-text-low border-neutral-200"}`}>
                       {r.status === "BERLAKU" ? "✓ BERLAKU" : "— TIDAK DITEMUKAN"}
                     </span>
                   </div>
@@ -1375,8 +1375,8 @@ function AiFeatureTester() {
             onClick={() => setSubTab(t.id)}
             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
               subTab === t.id
-                ? "bg-gold text-maroon-deep"
-                : "bg-surface-2 text-text-med hover:text-text-high border border-gold/15"
+                ? "bg-gold text-white"
+                : "bg-surface-2 text-text-med hover:text-text-high border border-neutral-200"
             }`}
           >
             {t.label}
@@ -1475,7 +1475,7 @@ function ApiTester() {
           <select
             value={method}
             onChange={(e) => setMethod(e.target.value)}
-            className="bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 w-28"
+            className="bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon w-28"
           >
             {["GET", "POST", "PATCH", "DELETE"].map((m) => (
               <option key={m} value={m}>{m}</option>
@@ -1486,7 +1486,7 @@ function ApiTester() {
             value={endpoint}
             onChange={(e) => setEndpoint(e.target.value)}
             placeholder="/api/endpoint"
-            className="flex-1 bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 font-mono"
+            className="flex-1 bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon font-mono"
           />
           <datalist id="endpoints">
             {KNOWN_ENDPOINTS.map((e) => (
@@ -1500,20 +1500,20 @@ function ApiTester() {
           onChange={(e) => setBodyText(e.target.value)}
           rows={8}
           placeholder={'JSON Body (untuk POST/PATCH):\n{\n  "key": "value"\n}'}
-          className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-xs font-mono focus:outline-none focus:border-gold/60 resize-y"
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-xs font-mono focus:outline-none focus:border-maroon resize-y"
         />
 
         <button
           onClick={sendRequest}
           disabled={loading}
-          className="w-full py-2.5 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+          className="w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {loading ? <><LoadingSpinner size="sm" /> Mengirim...</> : "Kirim Request"}
         </button>
       </div>
 
       {/* Response panel */}
-      <div className="bg-surface-2 border border-gold/15 rounded-xl p-4">
+      <div className="bg-surface-2 border border-neutral-200 rounded-xl p-4">
         <div className="flex items-center gap-3 mb-3">
           <span className="text-text-low text-xs uppercase tracking-wider">Response</span>
           {status !== null && (
@@ -1590,14 +1590,14 @@ function PlagiarismChecker() {
           onChange={(e) => setText(e.target.value)}
           rows={8}
           placeholder="Paste teks dokumen hukum yang ingin diperiksa plagiarismenya..."
-          className="w-full bg-surface-2 border border-gold/25 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-gold/60 resize-y"
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
         />
       </div>
 
       <button
         onClick={check}
         disabled={loading || !text.trim()}
-        className="w-full py-2.5 rounded-lg bg-gold text-maroon-deep font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {loading ? <><LoadingSpinner size="sm" /> Memeriksa...</> : "Periksa Plagiarisme"}
       </button>
@@ -1607,7 +1607,7 @@ function PlagiarismChecker() {
       )}
 
       {result && (
-        <div className="p-4 rounded-xl bg-surface-2 border border-gold/15 space-y-2">
+        <div className="p-4 rounded-xl bg-surface-2 border border-neutral-200 space-y-2">
           <p className="text-text-low text-xs uppercase tracking-wider">Hasil Pemeriksaan</p>
           {result.similarity !== undefined && (
             <div>
@@ -1667,8 +1667,8 @@ export default function TestingPage() {
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeTab === tab.id
-                ? "bg-gold text-maroon-deep"
-                : "bg-surface-1 text-text-med hover:text-text-high border border-gold/20"
+                ? "bg-gold text-white"
+                : "bg-surface-1 text-text-med hover:text-text-high border border-neutral-200"
             }`}
           >
             <span>{tab.icon}</span>
@@ -1678,7 +1678,7 @@ export default function TestingPage() {
       </div>
 
       {/* ── Active tab content ────────────────────────────────────────── */}
-      <div className="bg-surface-1 border border-gold/25 rounded-xl p-6">
+      <div className="bg-surface-1 border border-neutral-200 rounded-xl p-6">
         {activeTab === "push" && <PushNotifTester />}
         {activeTab === "ai" && <AiFeatureTester />}
         {activeTab === "api" && <ApiTester />}

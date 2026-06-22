@@ -6,15 +6,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  Users, 
+import {
+  LayoutDashboard,
+  Users,
   CreditCard,
-  Package, 
-  Wallet, 
-  BookOpen, 
-  Database, 
-  FlaskConical
+  Package,
+  Wallet,
+  BookOpen,
+  Database,
+  FlaskConical,
+  Radio,
+  Banknote
 } from "lucide-react";
 
 // Navigation structure — grouped by purpose
@@ -32,6 +34,7 @@ const NAV_GROUPS = [
     items: [
       { href: "/orders", label: "Orders", icon: <Package size={18} /> },
       { href: "/payments", label: "Payments", icon: <Wallet size={18} /> },
+      { href: "/webinars", label: "Webinars", icon: <Radio size={18} /> },
       { href: "/legal-catalog", label: "Legal Catalog", icon: <BookOpen size={18} /> },
       { href: "/knowledge-base", label: "Knowledge Base", icon: <Database size={18} /> },
     ],
@@ -39,12 +42,19 @@ const NAV_GROUPS = [
   {
     label: "ADMINISTRATION",
     items: [
+      { href: "/withdrawals", label: "Penarikan Saldo", icon: <Banknote size={18} /> },
       { href: "/testing", label: "Testing Suite", icon: <FlaskConical size={18} /> },
     ],
   },
 ];
 
-export function Sidebar() {
+export function Sidebar({
+  open = false,
+  onClose,
+}: {
+  open?: boolean;
+  onClose?: () => void;
+}) {
   const pathname = usePathname();
 
   // Check if the given href matches the current page
@@ -52,13 +62,31 @@ export function Sidebar() {
     pathname === href || pathname.startsWith(href + "/");
 
   return (
-    <aside className="w-60 shrink-0 h-screen bg-surface-1 border-r border-gold/15 flex flex-col overflow-hidden">
+    <>
+      {/* Backdrop (mobile only, saat drawer terbuka) */}
+      {open && (
+        <div
+          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
+
+      <aside
+        className={`
+          fixed inset-y-0 left-0 z-50 w-60 shrink-0 h-screen bg-surface-1
+          border-r border-neutral-200 flex flex-col overflow-hidden
+          transition-transform duration-300 ease-out
+          lg:static lg:z-auto lg:translate-x-0
+          ${open ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
       {/* ── Logo + Brand ────────────────────────────────────────────── */}
-      <div className="px-5 py-5 border-b border-gold/15">
+      <div className="px-5 py-5 border-b border-neutral-200">
         <div className="flex items-center gap-3">
-          {/* "L" icon with gold gradient background */}
-          <div className="w-9 h-9 rounded-lg bg-linear-to-br from-gold to-gold-dim flex items-center justify-center shrink-0">
-            <span className="text-maroon-deep font-bold text-base font-serif">L</span>
+          {/* "L" icon — solid merah (tanpa gradient) */}
+          <div className="w-9 h-9 rounded-lg bg-maroon flex items-center justify-center shrink-0">
+            <span className="text-white font-bold text-base font-serif">L</span>
           </div>
           <div>
             <p className="text-gold font-bold text-sm font-serif tracking-wider leading-none">
@@ -87,11 +115,12 @@ export function Sidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={onClose}
                   className={`
                     flex items-center gap-3 px-3 py-2.5 rounded-lg mb-0.5 text-sm transition-all
                     ${
                       active
-                        ? "bg-surface-3 text-gold border-l-2 border-gold font-medium"
+                        ? "bg-maroon text-white border-l-2 border-maroon font-medium"
                         : "text-text-med hover:bg-surface-2 hover:text-text-high border-l-2 border-transparent"
                     }
                   `}
@@ -108,11 +137,12 @@ export function Sidebar() {
       </nav>
 
       {/* ── Bottom divider ───────────────────────────────────────────── */}
-      <div className="border-t border-gold/15 p-3">
+      <div className="border-t border-neutral-200 p-3">
         <p className="text-text-low text-[10px] text-center">
           Lexsee Admin Console v1.0
         </p>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }

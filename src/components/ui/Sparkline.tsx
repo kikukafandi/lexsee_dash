@@ -11,7 +11,7 @@ type SparklineProps = {
 
 export function Sparkline({
   data,
-  color = "#C9A84C",
+  color = "#C0162C",
   width = 80,
   height = 32,
 }: SparklineProps) {

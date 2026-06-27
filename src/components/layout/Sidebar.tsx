@@ -16,7 +16,8 @@ import {
   Database,
   FlaskConical,
   Radio,
-  Banknote
+  Banknote,
+  Sparkles
 } from "lucide-react";
 
 // Navigation structure — grouped by purpose
@@ -37,6 +38,7 @@ const NAV_GROUPS = [
       { href: "/webinars", label: "Webinars", icon: <Radio size={18} /> },
       { href: "/legal-catalog", label: "Legal Catalog", icon: <BookOpen size={18} /> },
       { href: "/knowledge-base", label: "Knowledge Base", icon: <Database size={18} /> },
+      { href: "/ai-store", label: "Kuota AI", icon: <Sparkles size={18} /> },
     ],
   },
   {

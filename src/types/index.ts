@@ -18,7 +18,24 @@ export type DocType =
   | "JURNAL"
   | "LAINNYA";
 export type PaymentStatus = "PENDING" | "SUCCESS" | "FAILED";
-export type PaymentType = "MEMBERSHIP" | "BOOK";
+export type PaymentType = "MEMBERSHIP" | "BOOK" | "WEBINAR" | "AI_FEATURE";
+
+export type AiFeatureKey =
+  | "opinion"
+  | "analyze-expert"
+  | "compare"
+  | "analyze-verdict"
+  | "compliance";
+
+export type AiFeatureProduct = {
+  id: string;
+  featureKey: AiFeatureKey;
+  label: string;
+  quota: number;
+  price: string; // Prisma Decimal serialized as string
+  isActive: boolean;
+  createdAt: string;
+};
 export type OrderStatus =
   | "PENDING"
   | "PAID"

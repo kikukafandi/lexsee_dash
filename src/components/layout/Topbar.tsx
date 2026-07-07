@@ -6,6 +6,7 @@
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import type { User } from "@/types";
+import { AdminNotificationBell } from "./AdminNotificationBell";
 
 type TopbarProps = {
   user: User | null;
@@ -21,6 +22,7 @@ const PAGE_NAMES: Record<string, string> = {
   "/orders": "Orders",
   "/payments": "Payments",
   "/webinars": "Webinars",
+  "/expert-applications": "Pengajuan Ahli Hukum",
   "/withdrawals": "Penarikan Saldo",
   "/legal-catalog": "Legal Catalog",
   "/knowledge-base": "Knowledge Base",
@@ -61,6 +63,9 @@ export function Topbar({ user, onLogout, onMenuClick }: TopbarProps) {
 
       {/* ── Spacer ───────────────────────────────────────────────────── */}
       <div className="flex-1" />
+
+      {/* ── Notifikasi aktivitas ─────────────────────────────────────── */}
+      <AdminNotificationBell />
 
       {/* ── User info + Logout ───────────────────────────────────────── */}
       <div className="flex items-center gap-3">

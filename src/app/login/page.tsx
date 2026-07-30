@@ -14,7 +14,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 export default function LoginPage() {
   const router = useRouter();
 
-  const [email, setEmail] = useState("admin@lexsee.id");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -104,7 +104,7 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-4 py-2.5 text-text-high text-sm placeholder-text-low focus:outline-none focus:border-maroon focus:bg-surface-2 transition-colors"
-                placeholder="admin@lexsee.id"
+                placeholder="email@perusahaan.id"
               />
             </div>
 
@@ -146,11 +146,6 @@ export default function LoginPage() {
               )}
             </button>
           </form>
-
-          {/* Default credentials hint for development */}
-          <p className="mt-5 text-center text-text-low text-xs border-t border-neutral-100 pt-4">
-            Dev credentials: admin@lexsee.id / Admin@123
-          </p>
         </div>
       </div>
     </div>

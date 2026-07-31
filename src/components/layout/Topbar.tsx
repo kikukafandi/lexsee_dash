@@ -27,11 +27,15 @@ const PAGE_NAMES: Record<string, string> = {
   "/legal-catalog": "Legal Catalog",
   "/knowledge-base": "Knowledge Base",
   "/testing": "Testing Suite",
+  "/notifications": "Notifikasi",
 };
 
 export function Topbar({ user, onLogout, onMenuClick }: TopbarProps) {
   const pathname = usePathname();
-  const pageName = PAGE_NAMES[pathname] ?? "Dashboard";
+  // Cocokkan path persis; kalau tidak ada (mis. rute detail /notifications/[id])
+  // pakai segmen pertamanya.
+  const pageName =
+    PAGE_NAMES[pathname] ?? PAGE_NAMES[`/${pathname.split("/")[1]}`] ?? "Dashboard";
 
   // Get initials from user's name for the avatar
   const initials = user?.name

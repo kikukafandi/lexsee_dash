@@ -80,8 +80,27 @@ export function DataTable<T extends { id?: string }>({
                 <tr
                   key={row.id ?? rowIndex}
                   onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  // [WEB-06] Baris yang bisa diklik dulu hanya merespons mouse:
+                  // tidak bisa di-Tab, tidak bisa ditekan Enter, dan pembaca layar
+                  // tidak mengumumkannya sebagai sesuatu yang dapat diaktifkan.
+                  // Seluruh kolom data dashboard jadi tidak terjangkau keyboard.
+                  tabIndex={onRowClick ? 0 : undefined}
+                  role={onRowClick ? "button" : undefined}
+                  onKeyDown={
+                    onRowClick
+                      ? (e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            // Spasi default-nya menggulirkan halaman.
+                            e.preventDefault();
+                            onRowClick(row);
+                          }
+                        }
+                      : undefined
+                  }
                   className={`border-b border-neutral-100 hover:bg-neutral-50 transition-colors ${
-                    onRowClick ? "cursor-pointer" : ""
+                    onRowClick
+                      ? "cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-inset"
+                      : ""
                   }`}
                 >
                   {columns.map((col) => (

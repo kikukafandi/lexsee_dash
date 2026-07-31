@@ -18,7 +18,9 @@ import {
   Radio,
   Banknote,
   Sparkles,
-  Scale
+  Scale,
+  Ticket,
+  SlidersHorizontal
 } from "lucide-react";
 
 // Navigation structure — grouped by purpose
@@ -47,6 +49,8 @@ const NAV_GROUPS = [
     items: [
       { href: "/expert-applications", label: "Pengajuan Ahli Hukum", icon: <Scale size={18} /> },
       { href: "/withdrawals", label: "Penarikan Saldo", icon: <Banknote size={18} /> },
+      { href: "/vouchers", label: "Voucher", icon: <Ticket size={18} /> },
+      { href: "/settings", label: "Pengaturan Harga", icon: <SlidersHorizontal size={18} /> },
       { href: "/testing", label: "Testing Suite", icon: <FlaskConical size={18} /> },
     ],
   },

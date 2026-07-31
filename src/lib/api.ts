@@ -5,6 +5,14 @@
 
 const TOKEN_KEY = "lexsee_admin_token";
 
+/** Error request yang membawa status HTTP, agar pemanggil bisa membedakan 404 dsb. */
+export class ApiError extends Error {
+    constructor(message: string, readonly status: number) {
+        super(message);
+        this.name = "ApiError";
+    }
+}
+
 /**
  * A generic fetch wrapper that:
  * 1. Automatically attaches the JWT token from localStorage
@@ -53,7 +61,18 @@ export async function apiFetch<T>(
         const errorBody = await response.json().catch(() => ({}));
         const message =
             errorBody.message ?? `Request failed with status ${response.status}`;
-        throw new Error(message);
+        throw new ApiError(message, response.status);
+    }
+
+    // 204 No Content (dan response tanpa body JSON) tidak punya apa pun untuk
+    // di-parse: response.json() melempar SyntaxError, sehingga DELETE yang
+    // sebenarnya berhasil tampak gagal di UI.
+    if (response.status === 204 || response.headers.get("content-length") === "0") {
+        return undefined as T;
+    }
+    const contentType = response.headers.get("content-type") ?? "";
+    if (!contentType.includes("json")) {
+        return undefined as T;
     }
 
     return response.json() as Promise<T>;

@@ -5,41 +5,20 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Bell } from "lucide-react";
 import { apiFetch } from "@/lib/api";
-
-type AdminNotif = {
-  id: string;
-  type: string;
-  title: string;
-  body: string;
-  entityId?: string | null;
-  isRead: boolean;
-  createdAt: string;
-};
-type Feed = { items: AdminNotif[]; unreadCount: number };
-
-function ago(s: string) {
-  const diff = Date.now() - new Date(s).getTime();
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return "baru saja";
-  if (m < 60) return `${m}m lalu`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}j lalu`;
-  return `${Math.floor(h / 24)}h lalu`;
-}
-
-const TARGET: Record<string, string> = { EXPERT_APPLICATION: "/expert-applications" };
+import { ago, NOTIF_REFRESH_EVENT, type AdminNotif, type NotifFeed } from "@/lib/notifications";
 
 export function AdminNotificationBell() {
   const router = useRouter();
-  const [feed, setFeed] = useState<Feed>({ items: [], unreadCount: 0 });
+  const [feed, setFeed] = useState<NotifFeed>({ items: [], unreadCount: 0 });
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
     try {
-      const res = await apiFetch<Feed>("/api/admin/notifications");
+      const res = await apiFetch<NotifFeed>("/api/admin/notifications");
       setFeed({ items: res.items ?? [], unreadCount: res.unreadCount ?? 0 });
     } catch {
       /* diam saja — polling ringan */
@@ -49,7 +28,12 @@ export function AdminNotificationBell() {
   useEffect(() => {
     load();
     const t = setInterval(load, 30_000);
-    return () => clearInterval(t);
+    // Halaman notifikasi memicu event ini agar badge langsung ikut berubah.
+    window.addEventListener(NOTIF_REFRESH_EVENT, load);
+    return () => {
+      clearInterval(t);
+      window.removeEventListener(NOTIF_REFRESH_EVENT, load);
+    };
   }, [load]);
 
   // Tutup dropdown saat klik di luar.
@@ -73,11 +57,10 @@ export function AdminNotificationBell() {
     }
   }
 
+  // Buka halaman detail — status dibaca diurus halaman detail itu sendiri.
   function openItem(n: AdminNotif) {
     setOpen(false);
-    if (!n.isRead) markRead([n.id]);
-    const target = TARGET[n.type];
-    if (target) router.push(target);
+    router.push(`/notifications/${n.id}`);
   }
 
   return (
@@ -130,6 +113,13 @@ export function AdminNotificationBell() {
               </button>
             ))
           )}
+          <Link
+            href="/notifications"
+            onClick={() => setOpen(false)}
+            className="block px-4 py-3 text-center text-maroon text-xs font-semibold hover:bg-surface-2 transition-colors border-t border-neutral-200"
+          >
+            Lihat semua notifikasi
+          </Link>
         </div>
       )}
     </div>

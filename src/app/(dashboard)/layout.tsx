@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getToken, getProfile, removeToken } from "@/lib/auth";
+import { ApiError } from "@/lib/api";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Topbar } from "@/components/layout/Topbar";
 import { PageLoader } from "@/components/ui/LoadingSpinner";
@@ -24,12 +25,14 @@ export default function DashboardLayout({
   const [checking, setChecking] = useState(true);
   // Drawer sidebar untuk layar kecil (mobile/tablet)
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // Backend tak terjangkau — beda dari "token tidak valid", jadi sesi dipertahankan
+  const [authError, setAuthError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Safety net: if auth takes more than 8 seconds, redirect to login
+    // Safety net: kalau verifikasi tak selesai dalam 8 detik, tampilkan error —
+    // JANGAN hapus token. Backend lambat/mati bukan bukti sesi tidak sah.
     const safetyTimer = setTimeout(() => {
-      removeToken();
-      router.push("/login");
+      setAuthError("Server tidak merespons. Periksa koneksi, lalu coba lagi.");
       setChecking(false);
     }, 8000);
 
@@ -53,10 +56,20 @@ export default function DashboardLayout({
         }
 
         setUser(profile);
-      } catch {
-        // Token invalid or network error — clear and redirect
-        removeToken();
-        router.push("/login");
+      } catch (err) {
+        // [SEC/UX] Hanya 401/403 yang berarti sesi tidak sah. Sebelumnya SEMUA
+        // error — termasuk backend mati atau wifi putus — menghapus token, jadi
+        // admin ter-logout tiap kali jaringan tersendat (temuan WEB-04).
+        if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
+          removeToken();
+          router.push("/login");
+          return;
+        }
+        setAuthError(
+          err instanceof Error && err.message
+            ? `Gagal memverifikasi sesi: ${err.message}`
+            : "Gagal memverifikasi sesi. Coba lagi.",
+        );
       } finally {
         clearTimeout(safetyTimer);
         setChecking(false);
@@ -66,6 +79,32 @@ export default function DashboardLayout({
     checkAuth();
     return () => clearTimeout(safetyTimer);
   }, [router]);
+
+  // Gagal karena jaringan/server: tawarkan coba-lagi, jangan paksa login ulang.
+  if (authError) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center gap-4 bg-bg p-6 text-center">
+        <p className="max-w-md text-sm text-textMed">{authError}</p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="rounded-md bg-maroon px-4 py-2 text-sm font-semibold text-white"
+        >
+          Coba lagi
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            removeToken();
+            router.push("/login");
+          }}
+          className="text-xs text-textLow underline"
+        >
+          Keluar dan login ulang
+        </button>
+      </div>
+    );
+  }
 
   // Show spinner while checking — avoids flash of protected UI
   // Also show spinner if user is null (redirect to /login is in progress)

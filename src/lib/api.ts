@@ -3,8 +3,6 @@
 // All requests go through Next.js rewrites (proxy), so no base URL is needed.
 // The proxy is configured in next.config.ts: /api/* → NestJS backend.
 
-const TOKEN_KEY = "lexsee_admin_token";
-
 /** Error request yang membawa status HTTP, agar pemanggil bisa membedakan 404 dsb. */
 export class ApiError extends Error {
     constructor(message: string, readonly status: number) {
@@ -15,9 +13,12 @@ export class ApiError extends Error {
 
 /**
  * A generic fetch wrapper that:
- * 1. Automatically attaches the JWT token from localStorage
- * 2. Sets Content-Type: application/json
- * 3. Throws a descriptive error if the response is not OK
+ * 1. Sets Content-Type: application/json
+ * 2. Throws a descriptive error if the response is not OK
+ *
+ * Autentikasi tidak diurus di sini: cookie sesi HttpOnly ikut otomatis pada
+ * request same-origin, dan `src/proxy.ts` yang mengubahnya jadi bearer token
+ * untuk backend (WEB-01).
  *
  * @param endpoint - The API path, e.g. "/api/legal/admin/stats"
  * @param options  - Standard fetch options (method, body, etc.)
@@ -29,18 +30,10 @@ export async function apiFetch<T>(
 ): Promise<T> {
     const { timeoutMs = 10_000, ...fetchOptions } = options;
 
-    // Read the JWT from localStorage (only available in the browser)
-    const token =
-        typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null;
-
     const headers: Record<string, string> = {
         "Content-Type": "application/json",
         ...(fetchOptions.headers as Record<string, string>),
     };
-
-    if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-    }
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);

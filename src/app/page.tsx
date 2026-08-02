@@ -1,25 +1,12 @@
-"use client";
+// Root page — arahkan ke /overview bila ada sesi, selain itu ke /login.
+// Keputusannya di server (cookie HttpOnly tidak terbaca dari browser).
 
-// Root page — redirects to /overview if logged in, otherwise to /login.
-// This runs immediately on app load to send the user to the right page.
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { getToken } from "@/lib/auth";
-import { PageLoader } from "@/components/ui/LoadingSpinner";
+import { SESSION_COOKIE } from "@/lib/session";
 
-export default function RootPage() {
-  const router = useRouter();
-
-  useEffect(() => {
-    // Check if a JWT token exists in localStorage
-    if (getToken()) {
-      router.replace("/overview");
-    } else {
-      router.replace("/login");
-    }
-  }, [router]);
-
-  // Show a loader while the redirect happens
-  return <PageLoader />;
+export default async function RootPage() {
+  const token = (await cookies()).get(SESSION_COOKIE)?.value;
+  redirect(token ? "/overview" : "/login");
 }

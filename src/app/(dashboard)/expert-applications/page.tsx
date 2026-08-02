@@ -10,7 +10,6 @@ import { apiFetch } from "@/lib/api";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 
-const TOKEN_KEY = "lexsee_admin_token";
 
 type ExpertUser = { id: string; name: string; email: string; phone?: string | null; photoUrl?: string | null };
 type Application = {
@@ -60,12 +59,10 @@ function statusVariant(s: string): "success" | "warning" | "danger" | "default" 
   return "default";
 }
 
-/** Stream dokumen PII dengan token (tak bisa via <img src> biasa karena butuh auth). */
+/** Stream dokumen PII (tak bisa via <img src> biasa karena butuh auth). */
 async function fetchDocUrl(appId: string, type: string): Promise<{ url: string; isImage: boolean }> {
-  const token = typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null;
-  const res = await fetch(`/api/expert/admin/applications/${appId}/documents/${type}`, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+  // Cookie sesi ikut otomatis; proxy yang mengubahnya jadi bearer ke backend.
+  const res = await fetch(`/api/expert/admin/applications/${appId}/documents/${type}`);
   if (!res.ok) throw new Error("Gagal memuat dokumen");
   const blob = await res.blob();
   return { url: URL.createObjectURL(blob), isImage: blob.type.startsWith("image/") };

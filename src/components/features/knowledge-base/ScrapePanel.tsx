@@ -9,8 +9,6 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Database, Download, Cpu, RefreshCw, Terminal, Upload, Square } from "lucide-react";
 import type { ScrapeSource, ScrapeLogLine, ScrapeCounts } from "@/types";
 
-const TOKEN_KEY = "lexsee_admin_token";
-
 type JobStatus = "RUNNING" | "DONE" | "FAILED" | "CANCELLED" | null;
 type JobPhase = "CATALOG" | "PROCESS" | "EMBED" | null;
 
@@ -71,7 +69,7 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
   }, [logs]);
 
   const openStream = useCallback(
-    (jobId: string) => {
+    async (jobId: string) => {
       esRef.current?.close();
       setLogs([]);
       setCounts(null);
@@ -79,9 +77,15 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
       setCancelling(false);
       setActiveJobId(jobId);
 
-      const token = typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null;
+      // EventSource tidak bisa mengirim header, jadi backend menyediakan tiket
+      // sekali-pakai (60 detik) — bukan JWT di query string, yang akan berakhir
+      // di access log dan riwayat browser.
+      const { ticket } = await apiFetch<{ ticket: string }>(
+        `/api/legal/admin/scrape/jobs/${jobId}/stream-ticket`,
+        { method: "POST" }
+      );
       const es = new EventSource(
-        `/api/legal/admin/scrape/jobs/${jobId}/stream?token=${encodeURIComponent(token ?? "")}`
+        `/api/legal/admin/scrape/jobs/${jobId}/stream?ticket=${encodeURIComponent(ticket)}`
       );
       esRef.current = es;
 
@@ -135,7 +139,7 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
         body: JSON.stringify(body),
       });
       setJobPhase(phase);
-      openStream(res.jobId);
+      await openStream(res.jobId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal memulai job.");
     } finally {
@@ -162,15 +166,14 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
     setUploadMsg("");
     setError("");
     try {
-      const token = typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null;
       const form = new FormData();
       form.append("file", uploadFile);
       if (uploadTitle.trim()) form.append("title", uploadTitle.trim());
 
-      // FormData multipart — jangan set Content-Type manual (browser atur boundary)
+      // FormData multipart — jangan set Content-Type manual (browser atur boundary).
+      // Auth ikut lewat cookie sesi; proxy yang memasang bearer ke backend.
       const res = await fetch("/api/legal/admin/scrape/upload", {
         method: "POST",
-        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         body: form,
       });
       if (!res.ok) {

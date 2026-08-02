@@ -11,32 +11,11 @@ const allowedDevOrigins = [
 
 const isDev = process.env.NODE_ENV === "development";
 
-// WEB-02 — CSP + baseline security headers.
-// ponytail: script-src pakai 'unsafe-inline' (bukan nonce), jadi CSP ini TIDAK
-// memblokir eksekusi script injeksi. Yang diblokirnya adalah jalur eksfiltrasinya:
-// connect-src/img-src/form-action 'self' berarti token di localStorage (WEB-01)
-// tidak bisa dikirim ke origin penyerang, dan object-src/base-uri/frame-ancestors
-// menutup plugin, base-tag hijack, serta clickjacking.
-// Upgrade ke nonce CSP (proxy.ts, lihat node_modules/next/dist/docs/01-app/02-guides/
-// content-security-policy.md) saat WEB-03 dikerjakan — nonce memaksa dynamic
-// rendering, jadi lakukan bersamaan dengan pemindahan auth ke server.
-const csp = [
-  "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' blob: data:",
-  "font-src 'self'",
-  // Dev butuh websocket HMR; produksi hanya same-origin (API lewat rewrite).
-  `connect-src 'self'${isDev ? " ws: http://localhost:*" : ""}`,
-  "object-src 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-  "frame-ancestors 'none'",
-  ...(isDev ? [] : ["upgrade-insecure-requests"]),
-].join("; ");
-
+// WEB-02 — baseline security headers.
+// Content-Security-Policy TIDAK di sini: sejak WEB-01/WEB-03 ia dibangun
+// per-request di `src/proxy.ts` karena memuat nonce, dan nonce harus baru tiap
+// request. Header statis di bawah ini tidak bergantung request, jadi tetap di sini.
 const securityHeaders = [
-  { key: "Content-Security-Policy", value: csp },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "X-Frame-Options", value: "DENY" },

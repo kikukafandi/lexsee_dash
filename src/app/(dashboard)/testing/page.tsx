@@ -1441,16 +1441,10 @@ function ApiTester() {
         body = bodyText;
       }
 
-      const token = typeof window !== "undefined"
-        ? localStorage.getItem("lexsee_admin_token")
-        : null;
-
+      // Auth ikut lewat cookie sesi (proxy memasang bearer ke backend).
       const res = await fetch(endpoint, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
+        headers: { "Content-Type": "application/json" },
         body,
       });
 

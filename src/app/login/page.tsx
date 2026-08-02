@@ -8,8 +8,14 @@ import { useState, useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
 
 import { useRouter } from "next/navigation";
-import { login, getToken, getProfile } from "@/lib/auth";
+import { login } from "@/lib/auth";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+
+// Nonce CSP hanya bisa ditempelkan saat render per-request: halaman yang
+// di-prerender saat build tidak punya nonce, sehingga seluruh script-nya
+// diblokir browser. Halaman ini satu-satunya halaman publik, jadi ia harus
+// dinamis (halaman dashboard sudah dinamis karena membaca cookie).
+export const dynamic = "force-dynamic";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,12 +30,9 @@ export default function LoginPage() {
     // Read URL params manually — avoids needing useSearchParams() + Suspense
     const params = new URLSearchParams(window.location.search);
     setAccessDenied(params.get("error") === "access-denied");
-
-    // If already logged in, go straight to the dashboard
-    if (getToken()) {
-      router.replace("/overview");
-    }
-  }, [router]);
+    // Tidak ada lagi cek "sudah login" di sini: cookie sesi HttpOnly tak terbaca
+    // browser, dan halaman ini memang tujuan redirect saat sesi tidak sah.
+  }, []);
 
   async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -37,22 +40,15 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // login() calls POST /api/auth/login and saves the JWT to localStorage
+      // Server yang memverifikasi kredensial + role ADMIN, lalu memasang cookie
+      // sesi HttpOnly. Role bukan ADMIN → route handler membalas 403 dan tidak
+      // menerbitkan cookie sama sekali.
       await login(email, password);
 
-      // Fetch the full profile to verify the ADMIN role
-      const profile = await getProfile();
-
-      if (profile.role !== "ADMIN") {
-        // Clear the token — non-admin users cannot access this dashboard
-        import("@/lib/auth").then(({ removeToken }) => removeToken());
-        setError("Akses ditolak. Hanya Admin yang diizinkan masuk ke Admin Console.");
-        setLoading(false);
-        return;
-      }
-
-      // All good — go to the dashboard
       router.push("/overview");
+      // Layout dashboard adalah server component: tanpa refresh, navigasi bisa
+      // memakai hasil render sebelum cookie ada.
+      router.refresh();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Login gagal. Periksa email dan password.";
       setError(message);

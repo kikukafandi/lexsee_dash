@@ -21,10 +21,17 @@ const PUBLIC_PATHS = new Set(["/", "/login"]);
 function cspHeader(nonce: string): string {
   return [
     "default-src 'self'",
-    // WEB-02 lanjutan: 'unsafe-inline' hilang dari script-src. Script hanya jalan
-    // bila membawa nonce request ini, jadi <script> hasil injeksi tidak dieksekusi.
-    // 'strict-dynamic' dibutuhkan karena bundle Next memuat chunk lain secara dinamis.
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
+    // WEB-02 lanjutan: 'unsafe-inline' hilang dari script-src. Inline script hanya
+    // jalan bila membawa nonce request ini, dan script eksternal hanya dari origin
+    // sendiri — keduanya menutup jalur eksekusi <script> hasil injeksi.
+    //
+    // TANPA 'strict-dynamic', dan ini disengaja. Contoh di dokumentasi Next
+    // memakainya, tetapi 'strict-dynamic' mematikan allowlist berbasis host
+    // ('self' diabaikan), sedangkan chunk Next dimuat lewat dynamic import() yang
+    // TIDAK mewarisi kepercayaan dari script pemanggilnya. Akibatnya seluruh chunk
+    // diblokir dan halaman mati total — terbukti di scripts/test-login-browser.mjs,
+    // dan tidak terlihat sama sekali oleh test berbasis curl.
+    `script-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-eval'" : ""}`,
     // ponytail: style tetap 'unsafe-inline' — React menulis style lewat CSSOM dan
     // Next menyisipkan <style> saat hydration; nonce di sini tidak menambah proteksi
     // terhadap eksekusi kode, hanya memecah tampilan.

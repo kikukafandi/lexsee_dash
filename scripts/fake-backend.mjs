@@ -44,13 +44,27 @@ http
         return json(401, { message: "Unauthorized" });
       }
 
-      // Endpoint lain: pantulkan apa yang diterima.
-      json(200, {
-        url: req.url,
-        method: req.method,
-        authorization: auth,
-        xff: req.headers["x-forwarded-for"] ?? null,
-      });
+      // Dua endpoint khusus untuk test-auth-boundary.sh: pantulkan apa yang
+      // diterima, supaya bisa dibuktikan bearer/XFF benar-benar sampai.
+      if (req.url === "/api/apa-saja" || req.url === "/api/echo-xff") {
+        return json(200, {
+          url: req.url,
+          method: req.method,
+          authorization: auth,
+          xff: req.headers["x-forwarded-for"] ?? null,
+        });
+      }
+
+      // Sisanya: halaman dashboard memanggil banyak endpoint daftar sekaligus.
+      // Balas kosong dengan bentuk yang benar, supaya halamannya tetap ter-render
+      // dan test browser menguji halamannya, bukan backend palsunya.
+      if (req.url?.startsWith("/api/legal/admin/stats")) {
+        return json(200, { documents: 0, chunks: 0, peraturan: 0 });
+      }
+      if (req.url?.startsWith("/api/admin/users")) {
+        return json(200, { users: [], total: 0 });
+      }
+      json(200, []);
     });
   })
   .listen(PORT, "127.0.0.1", () => console.log(`fake backend on ${PORT}`));

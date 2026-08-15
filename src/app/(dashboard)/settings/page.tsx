@@ -1,8 +1,12 @@
 "use client";
 
-// Settings — konfigurasi harga global: tarif pajak & biaya admin.
+// Settings — konfigurasi harga global: keuntungan, tarif pajak & biaya admin.
 // Sumber kebenaran ada di backend (PricingConfig). Pajak dihitung dari harga
 // setelah diskon; biaya admin fixed tanpa pajak.
+//
+// Keuntungan dipakai paket AI yang mengisi modal: harga jual = modal x
+// (1 + keuntungan), dibulatkan ke atas ke kelipatan seribu. Mengubahnya di
+// sini menggerakkan semua paket tersebut sekaligus, tanpa deploy.
 
 import { useEffect, useState } from "react";
 import { AlertTriangle, Check, Save } from "lucide-react";
@@ -13,6 +17,7 @@ type PricingConfig = {
   taxRate: number | string;
   taxEnabled: boolean;
   adminFee: number | string;
+  marginRate: number | string;
 };
 
 function formatRp(n: number): string {
@@ -20,6 +25,7 @@ function formatRp(n: number): string {
 }
 
 export default function SettingsPage() {
+  const [marginPercent, setMarginPercent] = useState(30);
   const [taxPercent, setTaxPercent] = useState(11);
   const [taxEnabled, setTaxEnabled] = useState(true);
   const [adminFee, setAdminFee] = useState(0);
@@ -33,6 +39,7 @@ export default function SettingsPage() {
     (async () => {
       try {
         const c = await apiFetch<PricingConfig>("/api/admin/pricing-config");
+        setMarginPercent(Number(c.marginRate) * 100);
         setTaxPercent(Number(c.taxRate) * 100);
         setTaxEnabled(c.taxEnabled);
         setAdminFee(Number(c.adminFee));
@@ -52,6 +59,7 @@ export default function SettingsPage() {
       await apiFetch("/api/admin/pricing-config", {
         method: "PUT",
         body: JSON.stringify({
+          marginRate: marginPercent / 100,
           taxRate: taxPercent / 100,
           taxEnabled,
           adminFee,
@@ -67,6 +75,10 @@ export default function SettingsPage() {
   };
 
   if (loading) return <PageLoader />;
+
+  // Contoh modal: tagihan Copyscape untuk paket 10.000 kata.
+  const sampleModal = 18200;
+  const sampleJual = Math.ceil((sampleModal * (1 + marginPercent / 100)) / 1000) * 1000;
 
   // Contoh perhitungan untuk harga dasar Rp100.000 (tanpa diskon)
   const sampleBase = 100000;
@@ -108,6 +120,25 @@ export default function SettingsPage() {
             <span className="text-xs text-text-low">Matikan untuk tidak membebankan pajak sama sekali</span>
           </div>
         </label>
+
+        {/* Keuntungan */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-text-high">Keuntungan (%)</label>
+          <input
+            type="number"
+            step="1"
+            min={0}
+            max={500}
+            value={marginPercent}
+            onChange={(e) => setMarginPercent(Number(e.target.value))}
+            className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-sm text-text-high focus:outline-none focus:border-maroon focus:ring-1 focus:ring-gold/50 transition-colors"
+          />
+          <p className="text-xs text-text-low">
+            Berlaku untuk paket AI yang mengisi modal. Modal {formatRp(sampleModal)} jadi{" "}
+            <span className="text-text-high font-medium">{formatRp(sampleJual)}</span> — untung{" "}
+            {formatRp(sampleJual - sampleModal)}. Paket bisa menetapkan persentasenya sendiri.
+          </p>
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {/* Tarif pajak */}

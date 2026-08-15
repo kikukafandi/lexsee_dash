@@ -84,8 +84,19 @@ export default function AiStorePage() {
               <tr key={p.id} className="border-t border-neutral-200">
                 <td className="px-4 py-3 text-text-med font-mono text-xs">{p.featureKey}</td>
                 <td className="px-4 py-3 text-text-high">{p.label}</td>
-                <td className="px-4 py-3 text-right text-text-high">{p.quota}x</td>
-                <td className="px-4 py-3 text-right text-gold">{formatRp(Number(p.price))}</td>
+                <td className="px-4 py-3 text-right text-text-high">
+                  {p.featureKey === "plagiarism" ? `${p.quota.toLocaleString("id-ID")} kata` : `${p.quota}x`}
+                </td>
+                {/* effectivePrice = harga yang benar-benar ditagih; untuk paket
+                    berbasis modal, kolom price mentah bukan harga jualnya. */}
+                <td className="px-4 py-3 text-right text-gold">
+                  {formatRp(p.effectivePrice ?? Number(p.price))}
+                  {p.costPrice != null && (
+                    <span className="block text-xs text-text-low font-normal">
+                      modal {formatRp(Number(p.costPrice))}
+                    </span>
+                  )}
+                </td>
                 <td className="px-4 py-3 text-center">
                   <Badge variant={p.isActive ? "info" : "default"}>{p.isActive ? "Aktif" : "Nonaktif"}</Badge>
                 </td>

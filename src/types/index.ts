@@ -20,12 +20,22 @@ export type DocType =
 export type PaymentStatus = "PENDING" | "SUCCESS" | "FAILED";
 export type PaymentType = "MEMBERSHIP" | "BOOK" | "WEBINAR" | "AI_FEATURE";
 
+// Harus sama persis dengan PAY_PER_USE_FEATURES di backend. Kunci yang hilang
+// di sini bukan sekadar type error: paketnya tidak bisa dibuat sama sekali
+// dari dashboard, jadi fiturnya tak pernah punya kuota untuk dijual.
 export type AiFeatureKey =
   | "opinion"
   | "analyze-expert"
   | "compare"
   | "analyze-verdict"
-  | "compliance";
+  | "compliance"
+  | "plagiarism"
+  | "lit-kuasa"
+  | "lit-gugatan"
+  | "lit-jawaban"
+  | "lit-replik"
+  | "lit-duplik"
+  | "lit-kesimpulan";
 
 export type AiFeatureProduct = {
   id: string;
@@ -33,6 +43,12 @@ export type AiFeatureProduct = {
   label: string;
   quota: number;
   price: string; // Prisma Decimal serialized as string
+  /** Modal paket (Rp). Terisi = harga jual dihitung, bukan diketik. */
+  costPrice?: string | null;
+  /** Keuntungan khusus paket ini (0.3 = 30%); null = ikut pengaturan global. */
+  marginRate?: string | null;
+  /** Harga jual efektif hasil hitungan backend — ini yang ditagih. */
+  effectivePrice?: number;
   isActive: boolean;
   createdAt: string;
 };

@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm, useWatch, SubmitHandler } from "react-hook-form";
+import { useForm, useWatch, useFieldArray, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { apiFetch } from "@/lib/api";
 import { Modal } from "@/components/ui/Modal";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Plus, X } from "lucide-react";
 import type { AiFeatureProduct, AiFeatureKey } from "@/types";
 
 const FEATURE_OPTIONS: { value: AiFeatureKey; label: string }[] = [
@@ -16,6 +16,7 @@ const FEATURE_OPTIONS: { value: AiFeatureKey; label: string }[] = [
   { value: "analyze-verdict", label: "AI Analisis Putusan" },
   { value: "compliance", label: "AI Compliance Tracker" },
   { value: "plagiarism", label: "Cek Plagiasi" },
+  { value: "ai-detect", label: "Deteksi AI" },
   { value: "lit-kuasa", label: "Surat Kuasa" },
   { value: "lit-gugatan", label: "Surat Gugatan" },
   { value: "lit-jawaban", label: "Jawaban/Eksepsi" },
@@ -27,6 +28,7 @@ const FEATURE_OPTIONS: { value: AiFeatureKey; label: string }[] = [
 /** Satuan kuota per fitur — cek plagiasi dijual per kata, sisanya per pakai. */
 const SATUAN_KUOTA: Partial<Record<AiFeatureKey, string>> = {
   plagiarism: "kata",
+  "ai-detect": "kata",
 };
 
 const productSchema = z.object({
@@ -40,6 +42,18 @@ const productSchema = z.object({
   // Kosong = ikut persentase global di Pengaturan Harga.
   marginPercent: z.coerce.number().min(0).max(500).optional(),
   isActive: z.boolean().default(true),
+  // Paket gabungan. Backend membuang entri yang mengulang fitur utama dan
+  // memekarkan sisanya jadi baris kuota tersendiri saat checkout.
+  extras: z
+    .array(
+      z.object({
+        featureKey: z.enum(
+          FEATURE_OPTIONS.map((o) => o.value) as [AiFeatureKey, ...AiFeatureKey[]],
+        ),
+        quota: z.coerce.number().int().min(1, "Kuota minimal 1"),
+      }),
+    )
+    .max(10, "Maksimal 10 fitur tambahan"),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -71,8 +85,12 @@ export function ProductForm({ isOpen, onClose, onSuccess, product }: ProductForm
       costPrice: undefined,
       marginPercent: undefined,
       isActive: true,
+      extras: [],
     },
   });
+
+  const { fields: extras, append: tambahExtra, remove: hapusExtra } =
+    useFieldArray({ control, name: "extras" });
 
   useEffect(() => {
     if (isOpen) {
@@ -85,6 +103,7 @@ export function ProductForm({ isOpen, onClose, onSuccess, product }: ProductForm
         marginPercent:
           product?.marginRate == null ? undefined : Number(product.marginRate) * 100,
         isActive: product?.isActive ?? true,
+        extras: product?.extras ?? [],
       });
       setError("");
     }
@@ -203,6 +222,51 @@ export function ProductForm({ isOpen, onClose, onSuccess, product }: ProductForm
               )}
             </div>
           )}
+
+          <div className="md:col-span-2 flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-text-high">Paket gabungan</label>
+              <button
+                type="button"
+                onClick={() => tambahExtra({ featureKey: "ai-detect", quota: 1000 })}
+                disabled={extras.length >= 10}
+                className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-lg border border-neutral-200 text-text-med hover:bg-surface-2 disabled:opacity-50"
+              >
+                <Plus size={13} /> Tambah fitur
+              </button>
+            </div>
+            <p className="text-xs text-text-low">
+              Kuota fitur lain yang ikut diberikan paket ini dengan satu harga
+              (mis. Paket Skripsi = Cek Plagiasi + Deteksi AI). Kosongkan untuk
+              paket fitur tunggal. Fitur utama di atas tidak perlu diulang.
+            </p>
+            {extras.map((f, i) => (
+              <div key={f.id} className="flex items-center gap-2">
+                <select {...register(`extras.${i}.featureKey`)} className={inputCls}>
+                  {FEATURE_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
+                <input
+                  type="number"
+                  {...register(`extras.${i}.quota`)}
+                  className={`${inputCls} max-w-[9rem]`}
+                  placeholder="kuota"
+                />
+                <button
+                  type="button"
+                  onClick={() => hapusExtra(i)}
+                  aria-label="Hapus fitur tambahan"
+                  className="p-2 rounded-lg border border-neutral-200 text-text-med hover:bg-surface-2"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ))}
+            {errors.extras?.message && (
+              <p className="text-xs text-danger">{errors.extras.message}</p>
+            )}
+          </div>
 
           <label className="flex items-center gap-2 text-sm text-text-high md:col-span-2">
             <input type="checkbox" {...register("isActive")} className="accent-maroon" />

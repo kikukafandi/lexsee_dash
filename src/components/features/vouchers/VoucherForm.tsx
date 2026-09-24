@@ -15,7 +15,7 @@ export type Voucher = {
   description?: string | null;
   type: "PERCENT" | "FIXED";
   value: number | string;
-  scope: "ALL" | "MEMBERSHIP" | "BOOK" | "WEBINAR" | "AI_FEATURE";
+  scope: "ALL" | "MEMBERSHIP" | "BOOK" | "WEBINAR" | "AI_FEATURE" | "CONSULTATION";
   minAmount?: number | string | null;
   maxRedemptions?: number | null;
   redeemedCount: number;
@@ -42,7 +42,7 @@ const voucherSchema = z
     description: z.string().optional(),
     type: z.enum(["PERCENT", "FIXED"]),
     value: z.coerce.number().min(0, "Nilai tidak boleh negatif"),
-    scope: z.enum(["ALL", "MEMBERSHIP", "BOOK", "WEBINAR", "AI_FEATURE"]),
+    scope: z.enum(["ALL", "MEMBERSHIP", "BOOK", "WEBINAR", "AI_FEATURE", "CONSULTATION"]),
     minAmount: optionalNumber,
     maxRedemptions: optionalNumber,
     perUserLimit: z.coerce.number().int().min(0).default(1),
@@ -64,6 +64,7 @@ const SCOPE_LABELS: Record<Voucher["scope"], string> = {
   BOOK: "Buku",
   WEBINAR: "Webinar",
   AI_FEATURE: "Kuota AI",
+  CONSULTATION: "Konsultasi ahli",
 };
 
 const inputCls =

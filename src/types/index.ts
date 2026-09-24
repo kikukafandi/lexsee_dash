@@ -18,7 +18,12 @@ export type DocType =
   | "JURNAL"
   | "LAINNYA";
 export type PaymentStatus = "PENDING" | "SUCCESS" | "FAILED";
-export type PaymentType = "MEMBERSHIP" | "BOOK" | "WEBINAR" | "AI_FEATURE";
+export type PaymentType =
+  | "MEMBERSHIP"
+  | "BOOK"
+  | "WEBINAR"
+  | "AI_FEATURE"
+  | "CONSULTATION";
 
 // Harus sama persis dengan PAY_PER_USE_FEATURES di backend. Kunci yang hilang
 // di sini bukan sekadar type error: paketnya tidak bisa dibuat sama sekali
@@ -30,6 +35,7 @@ export type AiFeatureKey =
   | "analyze-verdict"
   | "compliance"
   | "plagiarism"
+  | "ai-detect"
   | "lit-kuasa"
   | "lit-gugatan"
   | "lit-jawaban"
@@ -50,6 +56,11 @@ export type AiFeatureProduct = {
   /** Harga jual efektif hasil hitungan backend — ini yang ditagih. */
   effectivePrice?: number;
   isActive: boolean;
+  /**
+   * Paket gabungan: kuota fitur lain yang ikut diberikan produk ini dengan
+   * satu harga. Kosong/null = paket fitur tunggal.
+   */
+  extras?: { featureKey: AiFeatureKey; quota: number }[] | null;
   createdAt: string;
 };
 export type OrderStatus =

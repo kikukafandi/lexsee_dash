@@ -20,7 +20,8 @@ import {
   Sparkles,
   Scale,
   Ticket,
-  SlidersHorizontal
+  SlidersHorizontal,
+  MessagesSquare,
 } from "lucide-react";
 
 // Navigation structure — grouped by purpose
@@ -42,6 +43,7 @@ const NAV_GROUPS = [
       { href: "/legal-catalog", label: "Legal Catalog", icon: <BookOpen size={18} /> },
       { href: "/knowledge-base", label: "Knowledge Base", icon: <Database size={18} /> },
       { href: "/ai-store", label: "Kuota AI", icon: <Sparkles size={18} /> },
+      { href: "/consultations", label: "Konsultasi Ahli", icon: <MessagesSquare size={18} /> },
     ],
   },
   {

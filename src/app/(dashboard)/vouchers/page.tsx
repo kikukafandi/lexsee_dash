@@ -15,6 +15,7 @@ const SCOPE_LABELS: Record<Voucher["scope"], string> = {
   BOOK: "Buku",
   WEBINAR: "Webinar",
   AI_FEATURE: "Kuota AI",
+  CONSULTATION: "Konsultasi ahli",
 };
 
 function formatRp(n: number): string {

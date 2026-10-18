@@ -204,7 +204,7 @@ function PushNotifTester() {
 
 // ─── AI Feature Tester ─────────────────────────────────────────────────────
 
-type AiSubTab = "quick" | "conversation" | "generate" | "opinion" | "summarize" | "compare" | "verdict" | "expert" | "compliance" | "audit" | "citation";
+type AiSubTab = "quick" | "conversation" | "generate" | "opinion" | "summarize" | "compare" | "verdict" | "contract" | "expert" | "compliance" | "audit" | "citation";
 
 // ── Quick Chat (stateless) ────────────────────────────────────────────────
 
@@ -831,6 +831,91 @@ function CompareTester() {
   );
 }
 
+// ── Analisis Kontrak ──────────────────────────────────────────────────────
+
+function ContractTester() {
+  const [contractText, setContractText] = useState("");
+  const [perspective, setPerspective] = useState("");
+  const [result, setResult] = useState<{ analysis: string; sources: Array<{ title: string; excerpt: string }>; retrievedDocs: number } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function run() {
+    if (!contractText.trim()) return;
+    setLoading(true);
+    setResult(null);
+    setError("");
+    try {
+      const data = await apiFetch<{ analysis: string; sources: Array<{ title: string; excerpt: string }>; retrievedDocs: number }>("/api/legal/analyze-contract", {
+        method: "POST",
+        body: JSON.stringify({ contractText: contractText.trim(), ...(perspective.trim() && { perspective: perspective.trim() }) }),
+        timeoutMs: 120_000,
+      });
+      setResult(data);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Gagal");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-text-low text-xs">Syarat sah (Pasal 1320 KUH Perdata) → Hak &amp; Kewajiban → Risiko per Klausul (🔴/🟡/🟢) → Klausul yang Hilang → Rekomendasi.</p>
+      <div>
+        <label className="block text-text-low text-xs uppercase tracking-wider mb-1">Teks Kontrak</label>
+        <textarea
+          value={contractText}
+          onChange={(e) => setContractText(e.target.value)}
+          rows={8}
+          placeholder="Paste isi kontrak/perjanjian..."
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
+        />
+      </div>
+      <div>
+        <label className="block text-text-low text-xs uppercase tracking-wider mb-1">Sudut Pandang Pihak (opsional)</label>
+        <input
+          value={perspective}
+          onChange={(e) => setPerspective(e.target.value)}
+          placeholder="Mis. Penyewa, Pihak Kedua"
+          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
+        />
+      </div>
+      <button
+        onClick={run}
+        disabled={loading || !contractText.trim()}
+        className="w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+      >
+        {loading ? <><LoadingSpinner size="sm" /> Menganalisis kontrak...</> : "Analisis Kontrak"}
+      </button>
+      {error && <div className="p-3 rounded-lg bg-danger/10 border border-danger/25 text-danger text-sm">{error}</div>}
+      {result && (
+        <div className="space-y-3">
+          <div className="p-4 rounded-xl bg-surface-2 border border-neutral-200">
+            <p className="text-text-low text-xs uppercase tracking-wider mb-2">Hasil Analisis Kontrak</p>
+            <MarkdownRenderer content={result.analysis} />
+          </div>
+          {result.sources?.length > 0 && (
+            <details className="text-xs">
+              <summary className="text-text-low cursor-pointer hover:text-text-med flex items-center gap-1 list-none">
+                <BookOpen size={12} /> {result.sources.length} referensi · {result.retrievedDocs} dokumen dianalisa
+              </summary>
+              <div className="mt-2 bg-surface-2 border border-neutral-100 rounded-lg p-2 space-y-1.5">
+                {result.sources.map((s, i) => (
+                  <div key={i} className="py-1 border-b border-neutral-100 last:border-0">
+                    <p className="text-text-high font-medium">{i + 1}. {s.title}</p>
+                    <p className="text-text-low mt-0.5">{s.excerpt?.slice(0, 120)}...</p>
+                  </div>
+                ))}
+              </div>
+            </details>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Analisis Putusan ──────────────────────────────────────────────────────
 
 function VerdictTester() {
@@ -1359,6 +1444,7 @@ function AiFeatureTester() {
     { id: "summarize", label: "Rangkum Regulasi" },
     { id: "compare", label: "Perbandingan" },
     { id: "verdict", label: "Analisis Putusan" },
+    { id: "contract", label: "Analisis Kontrak" },
     { id: "expert", label: "Pendapat Ahli" },
     { id: "generate", label: "Buat Perjanjian" },
     { id: "compliance", label: "Compliance" },
@@ -1390,6 +1476,7 @@ function AiFeatureTester() {
       {subTab === "summarize" && <SummarizeTester />}
       {subTab === "compare" && <CompareTester />}
       {subTab === "verdict" && <VerdictTester />}
+      {subTab === "contract" && <ContractTester />}
       {subTab === "expert" && <ExpertTester />}
       {subTab === "generate" && <GenerateDoc />}
       {subTab === "compliance" && <ComplianceTester />}

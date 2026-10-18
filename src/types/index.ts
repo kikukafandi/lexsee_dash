@@ -33,6 +33,7 @@ export type AiFeatureKey =
   | "analyze-expert"
   | "compare"
   | "analyze-verdict"
+  | "analyze-contract"
   | "compliance"
   | "plagiarism"
   | "ai-detect"

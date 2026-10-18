@@ -14,6 +14,7 @@ const FEATURE_OPTIONS: { value: AiFeatureKey; label: string }[] = [
   { value: "analyze-expert", label: "AI Analisis Pendapat Ahli" },
   { value: "compare", label: "AI Perbandingan" },
   { value: "analyze-verdict", label: "AI Analisis Putusan" },
+  { value: "analyze-contract", label: "AI Analisis Kontrak" },
   { value: "compliance", label: "AI Compliance Tracker" },
   { value: "plagiarism", label: "Cek Plagiasi" },
   { value: "ai-detect", label: "Deteksi AI" },

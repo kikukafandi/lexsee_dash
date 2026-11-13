@@ -51,3 +51,18 @@ test("pesanGalat: 500 dan pesan teknis tidak ditampilkan mentah", () => {
   assert.equal(pesanGalat(apiErr("Internal server error", 500), "menyimpan paket"), "Gagal menyimpan paket. Server sedang bermasalah, coba lagi sebentar lagi.");
   assert.equal(pesanGalat(apiErr("Request failed with status 404", 404), "memuat data"), "Gagal memuat data. Data tidak ditemukan.");
 });
+
+import { aksiPesanan } from "./labels.ts";
+
+test("aksiPesanan mengikuti alur status", () => {
+  assert.deepEqual(aksiPesanan("PAID"), [
+    { ke: "PROCESSING", tombol: "Proses" },
+    { ke: "CANCELLED", tombol: "Batalkan" },
+  ]);
+  assert.deepEqual(aksiPesanan("PROCESSING"), [
+    { ke: "SHIPPED", tombol: "Kirim" },
+    { ke: "CANCELLED", tombol: "Batalkan" },
+  ]);
+  assert.deepEqual(aksiPesanan("SHIPPED"), [{ ke: "DELIVERED", tombol: "Tandai diterima" }]);
+  for (const s of ["PENDING", "DELIVERED", "CANCELLED", "ANEH"]) assert.deepEqual(aksiPesanan(s), []);
+});

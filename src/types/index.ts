@@ -144,6 +144,8 @@ export type Order = {
   shippingCost: string;
   courierName?: string;
   courierService?: string;
+  /** Nomor resi, diisi admin saat pesanan dikirim. */
+  trackingNumber?: string | null;
   recipientName: string;
   phone: string;
   address: string;

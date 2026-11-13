@@ -133,3 +133,23 @@ export function pesanGalat(err: unknown, aksi: string): string {
   if (!teknis) return pesan;
   return `Gagal ${aksi}. Coba lagi.`;
 }
+
+/** Tombol aksi admin untuk pesanan buku per status; sama dengan alur di backend. */
+export function aksiPesanan(status: string): { ke: string; tombol: string }[] {
+  switch (status) {
+    case "PAID":
+      return [
+        { ke: "PROCESSING", tombol: "Proses" },
+        { ke: "CANCELLED", tombol: "Batalkan" },
+      ];
+    case "PROCESSING":
+      return [
+        { ke: "SHIPPED", tombol: "Kirim" },
+        { ke: "CANCELLED", tombol: "Batalkan" },
+      ];
+    case "SHIPPED":
+      return [{ ke: "DELIVERED", tombol: "Tandai diterima" }];
+    default:
+      return [];
+  }
+}

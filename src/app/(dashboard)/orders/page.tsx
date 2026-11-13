@@ -1,8 +1,7 @@
 "use client";
 
-// Orders page — view book orders and the book catalog.
-// Note: Only shows the admin user's own orders.
-// A future /api/admin/orders endpoint would be needed for all-user data.
+// Pesanan Buku — semua pesanan buku (GET /api/admin/orders) dan katalog buku.
+// Admin memproses pesanan lewat AksiPesanan (PATCH /api/admin/orders/:id/status).
 
 import { useEffect, useState } from "react";
 import { AlertTriangle } from "lucide-react";
@@ -14,6 +13,8 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { DetailModal } from "@/components/ui/DetailModal";
 import type { Order, Book } from "@/types";
 import { label, pesanGalat } from "@/lib/labels";
+import { AksiPesanan } from "@/components/features/orders/AksiPesanan";
+import { Toast, useToast } from "@/components/ui/Toast";
 
 // Order admin = order + relasi user pemesan
 type AdminOrder = Order & {
@@ -30,6 +31,14 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selected, setSelected] = useState<AdminOrder | null>(null);
+  const { toast, showToast } = useToast();
+
+  function sesudahAksi(o: AdminOrder, pesan: string) {
+    setOrders((list) => list.map((x) => (x.id === o.id ? o : x)));
+    setSelected((s) => (s && s.id === o.id ? o : s));
+    showToast(pesan);
+  }
+  const galatAksi = (pesan: string) => showToast(pesan, "error");
 
   const fmtRp = (n: number | string) => "Rp " + Number(n || 0).toLocaleString("id-ID");
   const fmtDateTime = (s: string) =>
@@ -100,6 +109,11 @@ export default function OrdersPage() {
       render: (row) => (
         <Badge variant={orderStatusVariant(row.status)}>{label("order", row.status)}</Badge>
       ),
+    },
+    {
+      header: "Aksi",
+      accessor: "id",
+      render: (row) => <AksiPesanan order={row} onDone={sesudahAksi} onError={galatAksi} />,
     },
     {
       header: "Tanggal",
@@ -213,8 +227,8 @@ export default function OrdersPage() {
           columns={orderColumns}
           data={orders}
           onRowClick={setSelected}
-          emptyMessage="Belum ada order"
-          emptyDescription="Order pembelian buku akan muncul di sini."
+          emptyMessage="Belum ada pesanan"
+          emptyDescription="Pesanan buku dari aplikasi akan muncul di sini."
         />
       </div>
 
@@ -234,7 +248,7 @@ export default function OrdersPage() {
       <DetailModal
         open={!!selected}
         title="Detail pesanan"
-        subtitle={selected?.id}
+        subtitle={selected ? `Dipesan ${fmtDateTime(selected.createdAt)}` : undefined}
         onClose={() => setSelected(null)}
         rows={
           selected
@@ -247,6 +261,7 @@ export default function OrdersPage() {
                 { label: "Alamat", value: selected.address ?? "—" },
                 { label: "Kode Pos", value: selected.postalCode ?? "—" },
                 { label: "Kurir", value: `${selected.courierName ?? "—"} ${selected.courierService ?? ""}`.trim() },
+                { label: "Nomor resi", value: selected.trackingNumber ?? "—" },
                 { label: "Ongkir", value: fmtRp(selected.shippingCost ?? 0) },
                 { label: "Total", value: <span className="font-semibold">{fmtRp(selected.totalAmount)}</span> },
                 {
@@ -265,7 +280,9 @@ export default function OrdersPage() {
               ]
             : []
         }
+        footer={selected ? <AksiPesanan order={selected} onDone={sesudahAksi} onError={galatAksi} /> : undefined}
       />
+      <Toast state={toast} />
     </div>
   );
 }

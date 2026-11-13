@@ -28,3 +28,25 @@ test("nama menu", () => {
   assert.equal(NAV_LABEL["/orders"], "Pesanan Buku");
   assert.equal(NAV_LABEL["/knowledge-base"], "Basis Pengetahuan AI");
 });
+
+import { pesanGalat } from "./labels.ts";
+
+const apiErr = (message, status) => Object.assign(new Error(message), { name: "ApiError", status });
+
+test("pesanGalat: sesi habis", () => {
+  assert.equal(pesanGalat(apiErr("Unauthorized", 401), "menyimpan paket"), "Sesi berakhir, silakan masuk lagi.");
+});
+test("pesanGalat: ditolak dengan alasan server", () => {
+  assert.equal(pesanGalat(apiErr("Tidak bisa mengubah peran sendiri", 403), "mengubah peran"), "Tidak bisa mengubah peran sendiri");
+});
+test("pesanGalat: server tidak terjangkau", () => {
+  assert.match(pesanGalat(new TypeError("fetch failed"), "memuat data"), /^Server tidak terjangkau/);
+  assert.match(pesanGalat(Object.assign(new Error("aborted"), { name: "AbortError" }), "memuat data"), /^Server tidak terjangkau/);
+});
+test("pesanGalat: validasi 400 memakai pesan server", () => {
+  assert.equal(pesanGalat(apiErr("Nomor resi wajib diisi.", 400), "mengirim pesanan"), "Nomor resi wajib diisi.");
+});
+test("pesanGalat: 500 dan pesan teknis tidak ditampilkan mentah", () => {
+  assert.equal(pesanGalat(apiErr("Internal server error", 500), "menyimpan paket"), "Gagal menyimpan paket. Server sedang bermasalah, coba lagi sebentar lagi.");
+  assert.equal(pesanGalat(apiErr("Request failed with status 404", 404), "memuat data"), "Gagal memuat data. Data tidak ditemukan.");
+});

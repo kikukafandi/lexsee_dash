@@ -107,3 +107,27 @@ export const NAV_LABEL: Record<string, string> = {
   "/testing": "Uji Fitur",
   "/notifications": "Notifikasi",
 };
+
+/**
+ * Pesan galat untuk admin dari error apa pun (ApiError, gagal jaringan, timeout).
+ * `aksi` adalah kata kerja, mis. "menyimpan paket", dipakai saat pesan server
+ * tidak layak ditampilkan.
+ */
+export function pesanGalat(err: unknown, aksi: string): string {
+  const e = err as { name?: string; message?: unknown; status?: number } | null;
+  if (e?.name === "AbortError" || e?.name === "TypeError") {
+    return "Server tidak terjangkau. Periksa koneksi lalu coba lagi.";
+  }
+  const status = typeof e?.status === "number" ? e.status : undefined;
+  const pesan = typeof e?.message === "string" ? e.message.trim() : "";
+  const teknis = !pesan || /^Request failed|Internal server error/i.test(pesan);
+
+  if (status === 401) return "Sesi berakhir, silakan masuk lagi.";
+  if (status !== undefined && status >= 500) {
+    return `Gagal ${aksi}. Server sedang bermasalah, coba lagi sebentar lagi.`;
+  }
+  if (status === 404 && teknis) return `Gagal ${aksi}. Data tidak ditemukan.`;
+  if (status === 403 && teknis) return "Anda tidak punya akses untuk aksi ini.";
+  if (!teknis) return pesan;
+  return `Gagal ${aksi}. Coba lagi.`;
+}

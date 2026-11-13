@@ -52,8 +52,9 @@ export async function apiFetch<T>(
     if (!response.ok) {
         // Try to extract a meaningful error message from the response body
         const errorBody = await response.json().catch(() => ({}));
-        const message =
-            errorBody.message ?? `Request failed with status ${response.status}`;
+        // Validasi NestJS mengirim message berupa array.
+        const raw = errorBody.message ?? `Request failed with status ${response.status}`;
+        const message = Array.isArray(raw) ? raw.join(". ") : String(raw);
         throw new ApiError(message, response.status);
     }
 

@@ -36,7 +36,7 @@ export function AksiPesanan<T extends PesananRingkas>({ order, onDone, onError }
     });
     const pesan =
       ke === "SHIPPED" ? "Pesanan ditandai dikirim. Pemesan mendapat nomor resi."
-      : ke === "CANCELLED" ? "Pesanan dibatalkan."
+      : ke === "CANCELLED" ? "Pesanan dibatalkan, stok dikembalikan."
       : ke === "DELIVERED" ? "Pesanan ditandai diterima."
       : "Pesanan sedang diproses.";
     onDone({ ...order, ...res }, pesan);
@@ -62,7 +62,7 @@ export function AksiPesanan<T extends PesananRingkas>({ order, onDone, onError }
         tone: "danger",
         confirmLabel: "Batalkan pesanan",
         aksi: "membatalkan pesanan",
-        message: `Pesanan untuk ${nama} akan dibatalkan dan pemesan mendapat pemberitahuan. Pengembalian dana dilakukan terpisah. Pembatalan tidak bisa diurungkan.`,
+        message: `Pesanan untuk ${nama} akan dibatalkan dan pemesan mendapat pemberitahuan. Stok bukunya dikembalikan. Pengembalian dana dilakukan terpisah. Pembatalan tidak bisa diurungkan.`,
         onConfirm: () => ubah("CANCELLED"),
       });
     }

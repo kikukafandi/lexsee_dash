@@ -4,7 +4,7 @@
 // Data dari GET /api/chat/online (in-memory presence dari WebSocket gateway).
 
 import { useEffect, useState } from "react";
-import { Circle } from "lucide-react";
+import { Circle, UserRound } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { label } from "@/lib/labels";
 
@@ -16,15 +16,6 @@ type OnlineUser = {
   role: string;
 };
 type OnlineResponse = { count: number; users: OnlineUser[] };
-
-function initials(name: string) {
-  return (name || "U")
-    .split(" ")
-    .slice(0, 2)
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase();
-}
 
 export function OnlineUsersCard() {
   const [data, setData] = useState<OnlineResponse>({ count: 0, users: [] });
@@ -79,9 +70,7 @@ export function OnlineUsersCard() {
                     className="w-8 h-8 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-8 h-8 rounded-full bg-surface-2 text-text-med flex items-center justify-center text-xs font-semibold">
-                    {initials(u.name)}
-                  </div>
+                  <UserRound size={22} className="m-[5px] text-text-med" aria-hidden="true" />
                 )}
                 <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-success border-2 border-white" />
               </div>

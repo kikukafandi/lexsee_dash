@@ -12,6 +12,8 @@ import { PageLoader } from "@/components/ui/LoadingSpinner";
 import type { AdminUser, AdminUsersResponse } from "@/types";
 import { Select } from "@/components/ui/Select";
 import { label, pesanGalat } from "@/lib/labels";
+import { UserPanel } from "@/components/features/users/UserPanel";
+import { Toast, useToast } from "@/components/ui/Toast";
 
 const PAGE_SIZE = 20;
 
@@ -89,6 +91,8 @@ export default function UsersPage() {
   const [data, setData] = useState<AdminUsersResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selected, setSelected] = useState<AdminUser | null>(null);
+  const { toast, showToast } = useToast();
 
   // Filter / search state
   const [search, setSearch] = useState("");
@@ -151,7 +155,7 @@ export default function UsersPage() {
       <div>
         <h1 className="text-2xl font-serif text-text-high">Pengguna</h1>
         <p className="text-text-med text-sm mt-0.5">
-          Manajemen seluruh pengguna platform Lexsee.
+          Klik pengguna untuk melihat detail, mengubah keanggotaan, atau mengubah peran.
         </p>
       </div>
 
@@ -167,7 +171,7 @@ export default function UsersPage() {
         {/* Total */}
         <div className="bg-surface-1 border border-neutral-200 rounded-xl p-5">
           <p className="text-text-low text-xs uppercase tracking-wider mb-1">
-            Total Pengguna
+            Total pengguna
           </p>
           <p className="text-text-high text-2xl font-serif font-semibold">
             {stats.total}
@@ -187,7 +191,7 @@ export default function UsersPage() {
         {/* Free */}
         <div className="bg-surface-1 border border-neutral-200 rounded-xl p-5">
           <p className="text-text-low text-xs uppercase tracking-wider mb-1">
-            Free
+            Tanpa keanggotaan
           </p>
           <p className="text-text-med text-2xl font-serif font-semibold">
             {stats.free}
@@ -255,10 +259,24 @@ export default function UsersPage() {
           page={page}
           totalPages={totalPages}
           onPageChange={setPage}
+          onRowClick={setSelected}
           emptyMessage="Tidak ada pengguna ditemukan"
           emptyDescription="Coba ubah filter atau kata kunci pencarian."
         />
       </div>
+
+      {selected && (
+        <UserPanel
+          user={selected}
+          onClose={() => setSelected(null)}
+          onSaved={(u, pesan) => {
+            setData((d) => d && { ...d, users: d.users.map((x) => (x.id === u.id ? u : x)) });
+            setSelected(u);
+            showToast(pesan);
+          }}
+        />
+      )}
+      <Toast state={toast} />
     </div>
   );
 }

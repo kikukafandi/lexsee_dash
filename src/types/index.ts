@@ -4,7 +4,7 @@
 
 // ─── Enums ─────────────────────────────────────────────────────────────────
 
-export type Role = "USER" | "PREMIUM" | "ADMIN";
+export type Role = "USER" | "PREMIUM" | "ADMIN" | "SALES" | "EXPERT_HUKUM";
 export type DocType =
   | "UU"
   | "PERPU"
@@ -265,6 +265,8 @@ export type AdminUser = {
   role: Role;
   createdAt: string;
   membershipTier: "FREE" | "SILVER" | "GOLD" | "PLATINUM";
+  /** Tanggal berakhir keanggotaan yang tersimpan; null kalau tidak ada. */
+  membershipEndsAt: string | null;
   lastPaymentAt: string | null;
 };
 

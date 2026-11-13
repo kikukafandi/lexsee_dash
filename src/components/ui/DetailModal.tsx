@@ -15,9 +15,11 @@ type DetailModalProps = {
   rows: DetailRow[];
   onClose: () => void;
   footer?: React.ReactNode;
+  /** Konten tambahan di bawah baris detail, mis. form aksi. */
+  children?: React.ReactNode;
 };
 
-export function DetailModal({ open, title, subtitle, rows, onClose, footer }: DetailModalProps) {
+export function DetailModal({ open, title, subtitle, rows, onClose, footer, children }: DetailModalProps) {
   // Tutup dengan tombol Escape
   useEffect(() => {
     if (!open) return;
@@ -64,6 +66,7 @@ export function DetailModal({ open, title, subtitle, rows, onClose, footer }: De
               </div>
             ))}
           </dl>
+          {children}
         </div>
 
         {footer && (

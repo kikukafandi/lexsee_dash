@@ -7,12 +7,17 @@ import { PageLoader } from "@/components/ui/LoadingSpinner";
 import { Badge } from "@/components/ui/Badge";
 import { ProductForm } from "@/components/features/ai-store/ProductForm";
 import type { AiFeatureProduct } from "@/types";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { Toast, useToast } from "@/components/ui/Toast";
+import { pesanGalat } from "@/lib/labels";
 
 function formatRp(amount: number): string {
   return `Rp ${amount.toLocaleString("id-ID")}`;
 }
 
 export default function AiStorePage() {
+  const { confirm, dialog } = useConfirm();
+  const { toast, showToast } = useToast();
   const [products, setProducts] = useState<AiFeatureProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -26,7 +31,7 @@ export default function AiStorePage() {
       const data = await apiFetch<AiFeatureProduct[]>("/api/admin/ai-products");
       setProducts(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal memuat produk");
+      setError(pesanGalat(err, "memuat paket kuota AI"));
     } finally {
       setLoading(false);
     }
@@ -34,15 +39,19 @@ export default function AiStorePage() {
 
   useEffect(() => { load(); }, [load]);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Hapus paket ini?")) return;
-    try {
-      await apiFetch(`/api/admin/ai-products/${id}`, { method: "DELETE" });
-      await load();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal menghapus");
-    }
-  };
+  const handleDelete = (id: string) =>
+    confirm({
+      title: "Hapus paket kuota AI",
+      tone: "danger",
+      confirmLabel: "Hapus",
+      aksi: "menghapus paket",
+      message: "Paket tidak bisa dibeli lagi di aplikasi. Kuota yang sudah dibeli pengguna tetap berlaku. Penghapusan tidak bisa dibatalkan.",
+      onConfirm: async () => {
+        await apiFetch(`/api/admin/ai-products/${id}`, { method: "DELETE" });
+        showToast("Paket dihapus.");
+        await load();
+      },
+    });
 
   if (loading) return <PageLoader />;
 
@@ -127,6 +136,8 @@ export default function AiStorePage() {
         onSuccess={load}
         product={editing}
       />
+      {dialog}
+      <Toast state={toast} />
     </div>
   );
 }

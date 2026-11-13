@@ -29,6 +29,8 @@ export const LABELS: Record<LabelGroup, Record<string, string>> = {
     MEMBERSHIP: "Keanggotaan",
     BOOK: "Buku",
     WEBINAR: "Webinar",
+    AI_FEATURE: "Kuota AI",
+    CONSULTATION: "Konsultasi ahli",
   },
   order: {
     PENDING: "Belum dibayar",

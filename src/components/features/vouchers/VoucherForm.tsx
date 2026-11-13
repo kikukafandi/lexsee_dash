@@ -211,7 +211,7 @@ export function VoucherForm({ isOpen, onClose, onSuccess, voucher }: Props) {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-text-high">Limit per User</label>
+            <label className="text-sm font-medium text-text-high">Batas per pengguna</label>
             <input type="number" step="1" {...register("perUserLimit")} className={inputCls} placeholder="1" />
             <p className="text-xs text-text-low">0 = tak terbatas per user</p>
           </div>

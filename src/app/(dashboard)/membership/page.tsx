@@ -10,6 +10,9 @@ import { PageLoader } from "@/components/ui/LoadingSpinner";
 import { Badge } from "@/components/ui/Badge";
 import { PlanForm } from "@/components/features/membership/PlanForm";
 import type { MembershipPlan, MembershipTier, AdminUsersResponse } from "@/types";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { Toast, useToast } from "@/components/ui/Toast";
+import { label, pesanGalat } from "@/lib/labels";
 
 // ─── Tier badge variant helper ───────────────────────────────────────────────
 
@@ -63,6 +66,8 @@ function StatCard({ label, value, tier }: StatCardProps) {
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export default function MembershipPage() {
+  const { confirm, dialog } = useConfirm();
+  const { toast, showToast } = useToast();
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
   const [tiers, setTiers] = useState<MembershipTier[]>([]);
   const [summary, setSummary] = useState<Record<string, number>>({});
@@ -84,7 +89,7 @@ export default function MembershipPage() {
       setTiers(Array.isArray(tiersData) ? tiersData : []);
       setSummary(usersData?.summary?.byMembership ?? {});
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Gagal memuat data membership.");
+      setError(pesanGalat(err, "memuat paket keanggotaan"));
     } finally {
       setLoading(false);
     }
@@ -108,16 +113,19 @@ export default function MembershipPage() {
     fetchAllData();
   };
 
-  const handleDelete = async (planId: string) => {
-    if (window.confirm("Apakah Anda yakin ingin menghapus plan ini?")) {
-      try {
+  const handleDelete = (planId: string) =>
+    confirm({
+      title: "Hapus paket keanggotaan",
+      tone: "danger",
+      confirmLabel: "Hapus",
+      aksi: "menghapus paket",
+      message: "Paket tidak bisa dibeli lagi. Pengguna yang sudah berlangganan tetap aktif sampai masa berlakunya habis. Penghapusan tidak bisa dibatalkan.",
+      onConfirm: async () => {
         await apiFetch(`/api/admin/membership-plans/${planId}`, { method: "DELETE" });
+        showToast("Paket dihapus.");
         handleSuccess();
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Gagal menghapus plan.");
-      }
-    }
-  };
+      },
+    });
 
   if (loading) return <PageLoader />;
 
@@ -289,7 +297,7 @@ export default function MembershipPage() {
                   className={idx % 2 === 0 ? "bg-transparent" : "bg-surface-2/40"}
                 >
                   <td className="px-5 py-3">
-                    <Badge variant={tierVariant(tier.tier)}>{tier.tier}</Badge>
+                    <Badge variant={tierVariant(tier.tier)}>{label("tier", tier.tier)}</Badge>
                   </td>
                   <td className="px-5 py-3 text-text-high">{tier.label}</td>
                   <td className="px-5 py-3 text-gold font-semibold">
@@ -316,6 +324,8 @@ export default function MembershipPage() {
         onSuccess={handleSuccess}
         plan={selectedPlan}
       />
+      {dialog}
+      <Toast state={toast} />
     </div>
   );
 }

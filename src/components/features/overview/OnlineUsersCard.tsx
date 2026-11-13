@@ -6,6 +6,7 @@
 import { useEffect, useState } from "react";
 import { Circle } from "lucide-react";
 import { apiFetch } from "@/lib/api";
+import { label } from "@/lib/labels";
 
 type OnlineUser = {
   id: string;
@@ -89,7 +90,7 @@ export function OnlineUsersCard() {
                 <p className="text-text-low text-xs truncate">{u.email}</p>
               </div>
               <span className="ml-auto text-[10px] uppercase tracking-wider text-text-low">
-                {u.role}
+                {label("role", u.role)}
               </span>
             </li>
           ))}

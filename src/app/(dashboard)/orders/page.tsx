@@ -13,6 +13,7 @@ import { Badge, orderStatusVariant } from "@/components/ui/Badge";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { DetailModal } from "@/components/ui/DetailModal";
 import type { Order, Book } from "@/types";
+import { label, pesanGalat } from "@/lib/labels";
 
 // Order admin = order + relasi user pemesan
 type AdminOrder = Order & {
@@ -46,7 +47,7 @@ export default function OrdersPage() {
         setOrders(Array.isArray(ordersData) ? ordersData : []);
         setBooks(Array.isArray(booksData) ? booksData : []);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Gagal memuat data.");
+        setError(pesanGalat(err, "memuat pesanan"));
       } finally {
         setLoading(false);
       }
@@ -97,7 +98,7 @@ export default function OrdersPage() {
       header: "Status",
       accessor: "status",
       render: (row) => (
-        <Badge variant={orderStatusVariant(row.status)}>{row.status}</Badge>
+        <Badge variant={orderStatusVariant(row.status)}>{label("order", row.status)}</Badge>
       ),
     },
     {
@@ -173,7 +174,7 @@ export default function OrdersPage() {
     <div className="space-y-6">
       {/* ── Page header ──────────────────────────────────────────────── */}
       <div>
-        <h1 className="text-2xl font-serif text-text-high">Orders & Books</h1>
+        <h1 className="text-2xl font-serif text-text-high">Pesanan Buku</h1>
         <p className="text-text-med text-sm mt-0.5">
           Manajemen pesanan buku fisik dan katalog buku.
         </p>
@@ -188,15 +189,15 @@ export default function OrdersPage() {
       {/* ── Summary ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-surface-1 border border-neutral-200 rounded-xl p-4 text-center">
-          <p className="text-text-low text-xs uppercase tracking-wider mb-1">Total Order</p>
+          <p className="text-text-low text-xs uppercase tracking-wider mb-1">Total pesanan</p>
           <p className="text-gold text-3xl font-serif font-bold">{orders.length}</p>
         </div>
         <div className="bg-surface-1 border border-neutral-200 rounded-xl p-4 text-center">
-          <p className="text-text-low text-xs uppercase tracking-wider mb-1">Total Buku</p>
+          <p className="text-text-low text-xs uppercase tracking-wider mb-1">Judul buku</p>
           <p className="text-gold text-3xl font-serif font-bold">{books.length}</p>
         </div>
         <div className="bg-surface-1 border border-neutral-200 rounded-xl p-4 text-center">
-          <p className="text-text-low text-xs uppercase tracking-wider mb-1">Stok Kritis</p>
+          <p className="text-text-low text-xs uppercase tracking-wider mb-1">Stok hampir habis</p>
           <p className="text-warning text-3xl font-serif font-bold">
             {books.filter((b) => b.stock <= 5).length}
           </p>
@@ -206,7 +207,7 @@ export default function OrdersPage() {
       {/* ── Orders table ──────────────────────────────────────────────── */}
       <div className="bg-surface-1 border border-neutral-200 rounded-xl overflow-hidden">
         <div className="px-5 py-3 border-b border-neutral-200">
-          <h2 className="text-text-high font-serif text-lg">Daftar Order</h2>
+          <h2 className="text-text-high font-serif text-lg">Daftar pesanan</h2>
         </div>
         <DataTable
           columns={orderColumns}
@@ -220,7 +221,7 @@ export default function OrdersPage() {
       {/* ── Book catalog table ────────────────────────────────────────── */}
       <div className="bg-surface-1 border border-neutral-200 rounded-xl overflow-hidden">
         <div className="px-5 py-3 border-b border-neutral-200">
-          <h2 className="text-text-high font-serif text-lg">Katalog Buku</h2>
+          <h2 className="text-text-high font-serif text-lg">Katalog buku</h2>
         </div>
         <DataTable
           columns={bookColumns}
@@ -232,7 +233,7 @@ export default function OrdersPage() {
 
       <DetailModal
         open={!!selected}
-        title="Detail Order"
+        title="Detail pesanan"
         subtitle={selected?.id}
         onClose={() => setSelected(null)}
         rows={
@@ -240,7 +241,7 @@ export default function OrdersPage() {
             ? [
                 { label: "Pemesan", value: selected.user?.name ?? "—" },
                 { label: "Email", value: selected.user?.email ?? "—" },
-                { label: "Status", value: <Badge variant={orderStatusVariant(selected.status)}>{selected.status}</Badge> },
+                { label: "Status", value: <Badge variant={orderStatusVariant(selected.status)}>{label("order", selected.status)}</Badge> },
                 { label: "Penerima", value: selected.recipientName },
                 { label: "Telepon", value: selected.phone },
                 { label: "Alamat", value: selected.address ?? "—" },

@@ -5,6 +5,7 @@ import { test } from "node:test";
 import { label, NAV_LABEL } from "./labels.ts";
 
 test("kode dikenal", () => {
+  assert.equal(label("paymentType", "AI_FEATURE"), "Kuota AI");
   assert.equal(label("withdrawal", "APPROVED"), "Disetujui, belum ditransfer");
   assert.equal(label("order", "SHIPPED"), "Dikirim");
   assert.equal(label("role", "EXPERT_HUKUM"), "Ahli Hukum");

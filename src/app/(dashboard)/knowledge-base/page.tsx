@@ -12,6 +12,9 @@ import { ThumbsUp, ThumbsDown, CheckCircle2, XCircle, Hourglass } from "lucide-r
 import ScrapePanel from "@/components/features/knowledge-base/ScrapePanel";
 import type { KbStats, LegalDocument, DocumentListResponse, DocType } from "@/types";
 import { Select } from "@/components/ui/Select";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { Toast, useToast } from "@/components/ui/Toast";
+import { label, pesanGalat } from "@/lib/labels";
 
 // The document type options available for ingestion
 const DOC_TYPE_OPTIONS: { value: DocType; label: string }[] = [
@@ -116,7 +119,7 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
       }
       onSuccess();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Gagal.");
+      setError(pesanGalat(err, "menambahkan dokumen"));
     } finally {
       setLoading(false);
     }
@@ -236,6 +239,8 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
 // ─── Main page ──────────────────────────────────────────────────────────────
 
 export default function KnowledgeBasePage() {
+  const { confirm, dialog } = useConfirm();
+  const { toast, showToast } = useToast();
   const [stats, setStats] = useState<KbStats | null>(null);
   const [docs, setDocs] = useState<LegalDocument[]>([]);
   const [docsPage, setDocsPage] = useState(1);
@@ -269,15 +274,20 @@ export default function KnowledgeBasePage() {
     loadDocs(1);
   }, [loadStats, loadDocs]);
 
-  async function handleDelete(id: string) {
-    if (!confirm("Hapus dokumen dari knowledge base AI? (Soft delete — tidak permanen)")) return;
-    try {
-      await apiFetch(`/api/legal/admin/documents/${id}`, { method: "DELETE" });
-      loadDocs(docsPage);
-      loadStats();
-    } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : "Gagal menghapus.");
-    }
+  function handleDelete(id: string) {
+    confirm({
+      title: "Nonaktifkan dokumen",
+      tone: "danger",
+      confirmLabel: "Nonaktifkan",
+      aksi: "menonaktifkan dokumen",
+      message: "Dokumen tidak akan dipakai lagi oleh AI untuk menjawab. Datanya tetap tersimpan dan bisa diaktifkan kembali oleh developer.",
+      onConfirm: async () => {
+        await apiFetch(`/api/legal/admin/documents/${id}`, { method: "DELETE" });
+        showToast("Dokumen dinonaktifkan.");
+        loadDocs(docsPage);
+        loadStats();
+      },
+    });
   }
 
   // Table columns for the document list
@@ -296,7 +306,7 @@ export default function KnowledgeBasePage() {
     {
       header: "Tipe",
       accessor: "type",
-      render: (row) => <Badge variant="info">{row.type}</Badge>,
+      render: (row) => <Badge variant="info">{label("docType", row.type)}</Badge>,
     },
     {
       header: "Chunks",
@@ -332,7 +342,7 @@ export default function KnowledgeBasePage() {
             onClick={() => handleDelete(row.id!)}
             className="text-danger hover:text-danger/70 text-xs font-medium transition-colors"
           >
-            Hapus
+            Nonaktifkan
           </button>
         ) : (
           <span className="text-text-low text-xs">Nonaktif</span>
@@ -391,6 +401,8 @@ export default function KnowledgeBasePage() {
         {/* Ingest panel */}
         <IngestPanel onSuccess={() => { loadDocs(1); loadStats(); }} />
       </div>
+      {dialog}
+      <Toast state={toast} />
     </div>
   );
 }

@@ -12,6 +12,7 @@ import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
 import { Select } from "@/components/ui/Select";
+import { LABELS, pesanGalat } from "@/lib/labels";
 
 type Topic = "KONSULTASI_HUKUM" | "BANTUAN_HUKUM" | "PENDAMPINGAN_SKRIPSI";
 type Status =
@@ -54,20 +55,8 @@ type Rate = {
   expert?: Orang;
 };
 
-const TOPIC_LABEL: Record<Topic, string> = {
-  KONSULTASI_HUKUM: "Konsultasi Hukum",
-  BANTUAN_HUKUM: "Bantuan Hukum",
-  PENDAMPINGAN_SKRIPSI: "Pendampingan Skripsi",
-};
-
-const STATUS_LABEL: Record<Status, string> = {
-  PENDING_PAYMENT: "Belum dibayar",
-  AWAITING_EXPERT: "Menunggu jawaban",
-  ANSWERED: "Dijawab",
-  EXPIRED: "Lewat SLA — perlu refund",
-  REFUNDED: "Sudah direfund",
-  CANCELLED: "Dibatalkan",
-};
+const TOPIC_LABEL = LABELS.consultationTopic as Record<Topic, string>;
+const STATUS_LABEL = LABELS.consultation as Record<Status, string>;
 
 function statusVariant(s: Status): "success" | "warning" | "danger" | "info" | "default" {
   if (s === "ANSWERED") return "success";
@@ -143,7 +132,7 @@ export default function ConsultationsPage() {
         setError("");
       })
       .catch((err: unknown) => {
-        if (aktif) setError(err instanceof Error ? err.message : "Gagal memuat data konsultasi.");
+        if (aktif) setError(pesanGalat(err, "memuat data konsultasi"));
       })
       .finally(() => {
         if (aktif) setLoading(false);
@@ -176,7 +165,7 @@ export default function ConsultationsPage() {
       setRefundRow(null);
       muatUlang();
     } catch (err: unknown) {
-      setModalError(err instanceof Error ? err.message : "Gagal menandai refund.");
+      setModalError(pesanGalat(err, "menandai refund"));
     } finally {
       setSaving(false);
     }
@@ -196,7 +185,7 @@ export default function ConsultationsPage() {
       setFeeRow(null);
       muatUlang();
     } catch (err: unknown) {
-      setModalError(err instanceof Error ? err.message : "Gagal menyimpan bagi hasil.");
+      setModalError(pesanGalat(err, "menyimpan bagi hasil"));
     } finally {
       setSaving(false);
     }
@@ -211,7 +200,7 @@ export default function ConsultationsPage() {
 
   const kolomTransaksi: Column<Consultation>[] = [
     { header: "Klien", accessor: "client", render: (r) => <Orang o={r.client} /> },
-    { header: "Expert", accessor: "expert", render: (r) => <Orang o={r.expert} /> },
+    { header: "Ahli", accessor: "expert", render: (r) => <Orang o={r.expert} /> },
     {
       header: "Layanan",
       accessor: "topic",
@@ -229,7 +218,7 @@ export default function ConsultationsPage() {
         <div className="text-xs">
           <p className="text-text-high font-semibold">{rupiah(r.price)}</p>
           <p className="text-text-low">
-            Expert {rupiah(r.expertEarning)} · Lexsee {rupiah(r.platformFee)} ({r.platformFeePercent}%)
+            Ahli {rupiah(r.expertEarning)} · Lexsee {rupiah(r.platformFee)} ({r.platformFeePercent}%)
           </p>
         </div>
       ),
@@ -255,7 +244,7 @@ export default function ConsultationsPage() {
 
   const kolomRefund: Column<Consultation>[] = [
     { header: "Klien", accessor: "client", render: (r) => <Orang o={r.client} /> },
-    { header: "Expert", accessor: "expert", render: (r) => <Orang o={r.expert} /> },
+    { header: "Ahli", accessor: "expert", render: (r) => <Orang o={r.expert} /> },
     {
       header: "Order",
       accessor: "orderId",
@@ -288,14 +277,14 @@ export default function ConsultationsPage() {
   ];
 
   const kolomTarif: Column<Rate & { id: string }>[] = [
-    { header: "Expert", accessor: "expert", render: (r) => <Orang o={r.expert} /> },
+    { header: "Ahli", accessor: "expert", render: (r) => <Orang o={r.expert} /> },
     {
       header: "Layanan",
       accessor: "topic",
       render: (r) => <span className="text-sm text-text-high">{TOPIC_LABEL[r.topic] ?? r.topic}</span>,
     },
     {
-      header: "Tarif · SLA",
+      header: "Tarif · batas waktu",
       accessor: "price",
       render: (r) => (
         <span className="text-sm text-text-high">
@@ -308,7 +297,7 @@ export default function ConsultationsPage() {
       accessor: "platformFeePercent",
       render: (r) => (
         <span className="text-sm text-text-high">
-          Expert {100 - r.platformFeePercent}% / Lexsee {r.platformFeePercent}%
+          Ahli {100 - r.platformFeePercent}% / Lexsee {r.platformFeePercent}%
         </span>
       ),
     },
@@ -336,7 +325,7 @@ export default function ConsultationsPage() {
   const tabs: { key: Tab; label: string }[] = [
     { key: "transaksi", label: "Transaksi" },
     { key: "refund", label: `Antrean refund (${refunds.length})` },
-    { key: "bagi-hasil", label: "Bagi hasil expert" },
+    { key: "bagi-hasil", label: "Bagi hasil ahli" },
   ];
 
   return (
@@ -344,8 +333,8 @@ export default function ConsultationsPage() {
       <div>
         <h1 className="text-2xl font-semibold text-text-high">Konsultasi Ahli</h1>
         <p className="text-text-med text-sm mt-1">
-          Konsultasi berbayar klien → expert. Expert dikredit saat menjawab; yang lewat
-          batas waktu masuk antrean refund.
+          Konsultasi berbayar dari klien ke ahli hukum. Ahli menerima bagiannya saat
+          menjawab; yang lewat batas waktu masuk antrean refund.
         </p>
       </div>
 
@@ -354,7 +343,7 @@ export default function ConsultationsPage() {
           { label: "Perlu refund", value: String(refunds.length) },
           { label: "Nilai refund", value: rupiah(nilaiRefund) },
           { label: "Pendapatan Lexsee", value: rupiah(pendapatanLexsee) },
-          { label: "Bagian expert", value: rupiah(bagianExpert) },
+          { label: "Bagian ahli", value: rupiah(bagianExpert) },
         ].map((k) => (
           <div key={k.label} className="bg-surface-1 border border-neutral-200 rounded-xl px-5 py-4 min-w-[180px]">
             <p className="text-text-low text-xs font-semibold uppercase tracking-wider">{k.label}</p>
@@ -363,7 +352,7 @@ export default function ConsultationsPage() {
         ))}
       </div>
       <p className="text-text-low text-xs -mt-3">
-        Pendapatan &amp; bagian expert dihitung dari konsultasi berstatus Dijawab pada daftar
+        Pendapatan dan bagian ahli dihitung dari konsultasi berstatus Dijawab pada daftar
         transaksi yang sedang ditampilkan (maks. 200 terbaru).
       </p>
 
@@ -417,7 +406,7 @@ export default function ConsultationsPage() {
             data={refunds}
             loading={loading}
             emptyMessage="Tidak ada yang perlu direfund"
-            emptyDescription="Konsultasi yang tidak dijawab expert sebelum batas waktunya akan muncul di sini."
+            emptyDescription="Konsultasi yang tidak dijawab ahli sebelum batas waktunya akan muncul di sini."
           />
         )}
         {tab === "bagi-hasil" && (
@@ -425,8 +414,8 @@ export default function ConsultationsPage() {
             columns={kolomTarif}
             data={rates.map((r) => ({ ...r, id: `${r.expertId}:${r.topic}` }))}
             loading={loading}
-            emptyMessage="Belum ada expert yang membuka layanan"
-            emptyDescription="Tarif muncul setelah expert mengatur layanannya di aplikasi."
+            emptyMessage="Belum ada ahli yang membuka layanan"
+            emptyDescription="Tarif muncul setelah ahli mengatur layanannya di aplikasi."
           />
         )}
       </div>
@@ -439,7 +428,7 @@ export default function ConsultationsPage() {
               <b className="text-text-high">{refundRow.client?.name ?? "klien"}</b>
               {refundRow.client?.email ? ` (${refundRow.client.email})` : ""} untuk order{" "}
               <span className="font-mono">{refundRow.orderId}</span> lebih dulu — tombol ini hanya
-              mencatat bahwa dana sudah dikembalikan. Saldo expert tidak berubah karena memang
+              mencatat bahwa dana sudah dikembalikan. Saldo ahli tidak berubah karena memang
               tidak pernah dikredit.
             </p>
             <div>
@@ -477,7 +466,7 @@ export default function ConsultationsPage() {
         {feeRow && (
           <div className="p-6 space-y-4">
             <p className="text-sm text-text-med">
-              {feeRow.expert?.name ?? "Expert"} · {TOPIC_LABEL[feeRow.topic]}. Berlaku untuk
+              {feeRow.expert?.name ?? "Ahli"} · {TOPIC_LABEL[feeRow.topic]}. Berlaku untuk
               transaksi berikutnya — transaksi yang sudah terjadi tetap memakai persentase lamanya.
             </p>
             <div>
@@ -493,7 +482,7 @@ export default function ConsultationsPage() {
               />
               <p className="text-xs text-text-low mt-1">
                 {feeValid
-                  ? `Dari tarif ${rupiah(feeRow.price)}: expert ${rupiah(Math.round(feeRow.price * (100 - feeAngka) / 100))}, Lexsee ${rupiah(Math.round(feeRow.price * feeAngka / 100))}.`
+                  ? `Dari tarif ${rupiah(feeRow.price)}: ahli ${rupiah(Math.round(feeRow.price * (100 - feeAngka) / 100))}, Lexsee ${rupiah(Math.round(feeRow.price * feeAngka / 100))}.`
                   : "Isi bilangan bulat 0–100."}
               </p>
             </div>

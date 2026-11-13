@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import type { User } from "@/types";
 import { AdminNotificationBell } from "./AdminNotificationBell";
+import { NAV_LABEL } from "@/lib/labels";
 
 type TopbarProps = {
   user: User | null;
@@ -14,28 +15,13 @@ type TopbarProps = {
   onMenuClick?: () => void;
 };
 
-// Maps URL paths to display names for the breadcrumb
-const PAGE_NAMES: Record<string, string> = {
-  "/overview": "Overview",
-  "/users": "Users",
-  "/membership": "Membership Plans",
-  "/orders": "Orders",
-  "/payments": "Payments",
-  "/webinars": "Webinars",
-  "/expert-applications": "Pengajuan Ahli Hukum",
-  "/withdrawals": "Penarikan Saldo",
-  "/legal-catalog": "Legal Catalog",
-  "/knowledge-base": "Knowledge Base",
-  "/testing": "Testing Suite",
-  "/notifications": "Notifikasi",
-};
 
 export function Topbar({ user, onLogout, onMenuClick }: TopbarProps) {
   const pathname = usePathname();
   // Cocokkan path persis; kalau tidak ada (mis. rute detail /notifications/[id])
   // pakai segmen pertamanya.
   const pageName =
-    PAGE_NAMES[pathname] ?? PAGE_NAMES[`/${pathname.split("/")[1]}`] ?? "Dashboard";
+    NAV_LABEL[pathname] ?? NAV_LABEL[`/${pathname.split("/")[1]}`] ?? "Dashboard";
 
   // Get initials from user's name for the avatar
   const initials = user?.name

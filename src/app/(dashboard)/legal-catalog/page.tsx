@@ -12,6 +12,8 @@ import { Modal } from "@/components/ui/Modal";
 import { RefreshCw, CheckCircle2, XCircle, Hourglass } from "lucide-react";
 import type { Peraturan, PeraturanListResponse } from "@/types";
 import { Select } from "@/components/ui/Select";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { pesanGalat } from "@/lib/labels";
 
 // Maps a jenis (regulation type) code to a Badge variant
 function jenisVariant(code: string) {
@@ -60,6 +62,7 @@ const COLUMNS: Column<Peraturan>[] = [
 ];
 
 export default function LegalCatalogPage() {
+  const { confirm, dialog } = useConfirm();
   // ── Data state ───────────────────────────────────────────────────────
   const [data, setData] = useState<Peraturan[]>([]);
   const [total, setTotal] = useState(0);
@@ -108,8 +111,18 @@ export default function LegalCatalogPage() {
   }, [load]);
 
   // ── Trigger JDIH Setneg sync ──────────────────────────────────────────
-  async function handleSync() {
-    if (!confirm("Jalankan sync JDIH Setneg? Proses bisa memakan 3–10 menit.")) return;
+  function handleSync() {
+    confirm({
+      title: "Ambil peraturan terbaru",
+      confirmLabel: "Mulai",
+      message: "Peraturan terbaru akan diambil dari JDIH Setneg. Prosesnya 3 sampai 10 menit, halaman ini boleh ditinggal.",
+      onConfirm: () => {
+        void jalankanSync();
+      },
+    });
+  }
+
+  async function jalankanSync() {
     setSyncing(true);
     setSyncMsg("");
     setSyncError("");
@@ -121,7 +134,7 @@ export default function LegalCatalogPage() {
       setSyncMsg(res.message ?? "Sync selesai!");
       load(1);
     } catch (err: unknown) {
-      setSyncError(err instanceof Error ? err.message : "Sync gagal.");
+      setSyncError(pesanGalat(err, "mengambil peraturan terbaru"));
     } finally {
       setSyncing(false);
     }
@@ -301,6 +314,7 @@ export default function LegalCatalogPage() {
           />
         )}
       </Modal>
+      {dialog}
     </div>
   );
 }

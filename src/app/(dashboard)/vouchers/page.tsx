@@ -8,6 +8,9 @@ import { apiFetch } from "@/lib/api";
 import { PageLoader } from "@/components/ui/LoadingSpinner";
 import { Badge } from "@/components/ui/Badge";
 import { VoucherForm, type Voucher } from "@/components/features/vouchers/VoucherForm";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { Toast, useToast } from "@/components/ui/Toast";
+import { pesanGalat } from "@/lib/labels";
 
 const SCOPE_LABELS: Record<Voucher["scope"], string> = {
   ALL: "Semua",
@@ -35,6 +38,8 @@ function validityLabel(v: Voucher): string {
 }
 
 export default function VouchersPage() {
+  const { confirm, dialog } = useConfirm();
+  const { toast, showToast } = useToast();
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -47,7 +52,7 @@ export default function VouchersPage() {
       const data = await apiFetch<Voucher[]>("/api/admin/vouchers");
       setVouchers(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal memuat voucher.");
+      setError(pesanGalat(err, "memuat voucher"));
     } finally {
       setLoading(false);
     }
@@ -62,15 +67,19 @@ export default function VouchersPage() {
     setIsFormOpen(true);
   };
 
-  const handleDelete = async (v: Voucher) => {
-    if (!window.confirm(`Hapus voucher "${v.code}"?`)) return;
-    try {
-      await apiFetch(`/api/admin/vouchers/${v.id}`, { method: "DELETE" });
-      fetchData();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal menghapus voucher.");
-    }
-  };
+  const handleDelete = (v: Voucher) =>
+    confirm({
+      title: "Hapus voucher",
+      tone: "danger",
+      confirmLabel: "Hapus",
+      aksi: "menghapus voucher",
+      message: `Voucher ${v.code} tidak bisa dipakai lagi saat checkout. Penghapusan tidak bisa dibatalkan.`,
+      onConfirm: async () => {
+        await apiFetch(`/api/admin/vouchers/${v.id}`, { method: "DELETE" });
+        showToast("Voucher dihapus.");
+        fetchData();
+      },
+    });
 
   if (loading) return <PageLoader />;
 
@@ -151,6 +160,8 @@ export default function VouchersPage() {
         onSuccess={fetchData}
         voucher={selected}
       />
+      {dialog}
+      <Toast state={toast} />
     </div>
   );
 }

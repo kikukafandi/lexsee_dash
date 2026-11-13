@@ -8,6 +8,9 @@ import { AlertTriangle } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { Toast, useToast } from "@/components/ui/Toast";
+import { label, pesanGalat } from "@/lib/labels";
 
 type Withdrawal = {
   id: string;
@@ -43,6 +46,8 @@ export default function WithdrawalsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [busyId, setBusyId] = useState<string | null>(null);
+  const { confirm, dialog } = useConfirm();
+  const { toast, showToast } = useToast();
 
   const load = useCallback(async () => {
     try {
@@ -50,7 +55,7 @@ export default function WithdrawalsPage() {
       setItems(Array.isArray(res) ? res : []);
       setError("");
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Gagal memuat data penarikan.");
+      setError(pesanGalat(err, "memuat data penarikan"));
     } finally {
       setLoading(false);
     }
@@ -60,19 +65,58 @@ export default function WithdrawalsPage() {
     load();
   }, [load]);
 
-  async function process(id: string, status: "APPROVED" | "TRANSFERRED" | "REJECTED") {
-    setBusyId(id);
-    try {
-      await apiFetch(`/api/webinar/admin/withdrawals/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify({ status }),
-      });
-      await load();
-    } catch {
-      setError("Gagal memproses penarikan.");
-    } finally {
-      setBusyId(null);
-    }
+  const AKSI = {
+    APPROVED: {
+      title: "Setujui penarikan",
+      confirmLabel: "Setujui",
+      akibat: "Setelah disetujui, lakukan transfer lalu tandai sudah ditransfer.",
+      sukses: "Penarikan disetujui.",
+    },
+    TRANSFERRED: {
+      title: "Tandai sudah ditransfer",
+      confirmLabel: "Ya, sudah ditransfer",
+      akibat: "Saldo ahli akan berkurang dan ini tidak bisa dibatalkan. Pastikan uangnya sudah benar-benar terkirim.",
+      sukses: "Penarikan ditandai sudah ditransfer.",
+    },
+    REJECTED: {
+      title: "Tolak penarikan",
+      confirmLabel: "Tolak",
+      akibat: "Saldo dikembalikan ke ahli dan permintaan ini ditutup.",
+      sukses: "Penarikan ditolak.",
+    },
+  } as const;
+
+  function process(w: Withdrawal, status: keyof typeof AKSI) {
+    const a = AKSI[status];
+    confirm({
+      title: a.title,
+      tone: status === "APPROVED" ? "default" : "danger",
+      confirmLabel: a.confirmLabel,
+      aksi: "memproses penarikan",
+      message: (
+        <>
+          <p>
+            <b className="text-text-high">{rupiah(Number(w.amount))}</b> untuk{" "}
+            <b className="text-text-high">{w.expert?.name ?? "ahli"}</b> ke {w.bankName}{" "}
+            {w.accountNumber} a.n. {w.accountName}.
+          </p>
+          <p className="mt-2">{a.akibat}</p>
+        </>
+      ),
+      onConfirm: async () => {
+        setBusyId(w.id);
+        try {
+          await apiFetch(`/api/webinar/admin/withdrawals/${w.id}`, {
+            method: "PATCH",
+            body: JSON.stringify({ status }),
+          });
+          showToast(a.sukses);
+          await load();
+        } finally {
+          setBusyId(null);
+        }
+      },
+    });
   }
 
   const pendingTotal = items
@@ -81,7 +125,7 @@ export default function WithdrawalsPage() {
 
   const columns: Column<Withdrawal>[] = [
     {
-      header: "Expert",
+      header: "Ahli",
       accessor: "expert",
       render: (row) => (
         <div>
@@ -115,7 +159,7 @@ export default function WithdrawalsPage() {
     {
       header: "Status",
       accessor: "status",
-      render: (row) => <Badge variant={statusVariant(row.status)}>{row.status}</Badge>,
+      render: (row) => <Badge variant={statusVariant(row.status)}>{label("withdrawal", row.status)}</Badge>,
     },
     {
       header: "Aksi",
@@ -126,14 +170,14 @@ export default function WithdrawalsPage() {
           return (
             <div className="flex gap-2">
               <button
-                onClick={() => process(row.id, "APPROVED")}
+                onClick={() => process(row, "APPROVED")}
                 disabled={disabled}
                 className="px-2.5 py-1 rounded-md bg-maroon text-white text-xs font-semibold hover:bg-maroon-dark transition-colors disabled:opacity-50"
               >
                 Setujui
               </button>
               <button
-                onClick={() => process(row.id, "REJECTED")}
+                onClick={() => process(row, "REJECTED")}
                 disabled={disabled}
                 className="px-2.5 py-1 rounded-md border border-neutral-300 text-text-med text-xs font-semibold hover:text-danger hover:border-danger/40 transition-colors disabled:opacity-50"
               >
@@ -145,11 +189,11 @@ export default function WithdrawalsPage() {
         if (row.status === "APPROVED") {
           return (
             <button
-              onClick={() => process(row.id, "TRANSFERRED")}
+              onClick={() => process(row, "TRANSFERRED")}
               disabled={disabled}
               className="px-2.5 py-1 rounded-md bg-success text-white text-xs font-semibold hover:opacity-90 transition-opacity disabled:opacity-50"
             >
-              Tandai Transfer
+              Tandai sudah ditransfer
             </button>
           );
         }
@@ -163,7 +207,7 @@ export default function WithdrawalsPage() {
       <div>
         <h1 className="text-2xl font-semibold text-text-high">Penarikan Saldo</h1>
         <p className="text-text-med text-sm mt-1">
-          Tinjau & proses permintaan penarikan saldo dari expert.
+          Tinjau dan proses permintaan penarikan saldo dari ahli hukum.
         </p>
       </div>
 
@@ -175,7 +219,7 @@ export default function WithdrawalsPage() {
           </p>
         </div>
         <div className="bg-surface-1 border border-neutral-200 rounded-xl px-5 py-4 min-w-[180px]">
-          <p className="text-text-low text-xs font-semibold uppercase tracking-wider">Nilai Pending</p>
+          <p className="text-text-low text-xs font-semibold uppercase tracking-wider">Total menunggu</p>
           <p className="text-2xl font-semibold text-text-high mt-1">{rupiah(pendingTotal)}</p>
         </div>
       </div>
@@ -192,9 +236,11 @@ export default function WithdrawalsPage() {
           data={items}
           loading={loading}
           emptyMessage="Belum ada permintaan penarikan"
-          emptyDescription="Permintaan withdrawal dari expert akan muncul di sini."
+          emptyDescription="Permintaan penarikan dari ahli hukum akan muncul di sini."
         />
       </div>
+      {dialog}
+      <Toast state={toast} />
     </div>
   );
 }

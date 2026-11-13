@@ -11,6 +11,7 @@ import { DataTable, type Column } from "@/components/ui/DataTable";
 import { PageLoader } from "@/components/ui/LoadingSpinner";
 import type { AdminUser, AdminUsersResponse } from "@/types";
 import { Select } from "@/components/ui/Select";
+import { label, pesanGalat } from "@/lib/labels";
 
 const PAGE_SIZE = 20;
 
@@ -49,10 +50,10 @@ const COLUMNS: Column<AdminUser>[] = [
     ),
   },
   {
-    header: "Role",
+    header: "Peran",
     accessor: "role",
     render: (row) => (
-      <Badge variant={roleVariant(row.role)}>{row.role}</Badge>
+      <Badge variant={roleVariant(row.role)}>{label("role", row.role)}</Badge>
     ),
     width: "w-28",
   },
@@ -61,7 +62,7 @@ const COLUMNS: Column<AdminUser>[] = [
     accessor: "membershipTier",
     render: (row) => (
       <Badge variant={membershipVariant(row.membershipTier)}>
-        {row.membershipTier}
+        {label("tier", row.membershipTier)}
       </Badge>
     ),
     width: "w-32",
@@ -99,9 +100,7 @@ export default function UsersPage() {
     apiFetch<AdminUsersResponse>("/api/admin/users")
       .then(setData)
       .catch((err: unknown) =>
-        setError(
-          err instanceof Error ? err.message : "Gagal memuat data pengguna."
-        )
+        setError(pesanGalat(err, "memuat data pengguna"))
       )
       .finally(() => setLoading(false));
   }, []);

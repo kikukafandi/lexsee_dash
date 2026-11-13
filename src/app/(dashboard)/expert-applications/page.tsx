@@ -9,6 +9,9 @@ import { AlertTriangle, FileText, ExternalLink } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { Toast, useToast } from "@/components/ui/Toast";
+import { label, pesanGalat } from "@/lib/labels";
 
 
 type ExpertUser = { id: string; name: string; email: string; phone?: string | null; photoUrl?: string | null };
@@ -78,6 +81,8 @@ export default function ExpertApplicationsPage() {
   const [docUrls, setDocUrls] = useState<Record<string, { url: string; isImage: boolean }>>({});
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const { confirm, dialog } = useConfirm();
+  const { toast, showToast } = useToast();
   const [modalError, setModalError] = useState("");
 
   const load = useCallback(async () => {
@@ -88,7 +93,7 @@ export default function ExpertApplicationsPage() {
       setItems(Array.isArray(res) ? res : []);
       setError("");
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Gagal memuat pengajuan.");
+      setError(pesanGalat(err, "memuat pengajuan"));
     } finally {
       setLoading(false);
     }
@@ -118,7 +123,7 @@ export default function ExpertApplicationsPage() {
       );
       setDocUrls(loaded);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Gagal memuat detail.");
+      setError(pesanGalat(err, "memuat detail pengajuan"));
     }
   }
 
@@ -131,22 +136,35 @@ export default function ExpertApplicationsPage() {
   async function review(decision: "APPROVED" | "REJECTED") {
     if (!detail) return;
     if (decision === "REJECTED" && !note.trim()) {
-      setModalError("Beri alasan penolakan agar user bisa memperbaiki.");
+      setModalError("Tulis alasan penolakan agar pemohon bisa memperbaikinya.");
       return;
     }
-    setBusy(true);
-    try {
-      await apiFetch(`/api/expert/admin/applications/${detail.id}/review`, {
-        method: "PATCH",
-        body: JSON.stringify({ decision, note: note.trim() || undefined }),
-      });
-      closeModal();
-      await load();
-    } catch (err: unknown) {
-      setModalError(err instanceof Error ? err.message : "Gagal memproses.");
-    } finally {
-      setBusy(false);
-    }
+    setModalError("");
+    const nama = detail.user?.name ?? "pemohon";
+    const setuju = decision === "APPROVED";
+    confirm({
+      title: setuju ? "Setujui pengajuan ahli" : "Tolak pengajuan ahli",
+      tone: setuju ? "default" : "danger",
+      confirmLabel: setuju ? "Setujui" : "Tolak",
+      aksi: "memproses pengajuan",
+      message: setuju
+        ? `${nama} akan menjadi Ahli Hukum, bisa membuka layanan konsultasi berbayar, dan menerima bagi hasil.`
+        : `${nama} akan menerima alasan penolakan dan bisa mengajukan ulang setelah memperbaikinya.`,
+      onConfirm: async () => {
+        setBusy(true);
+        try {
+          await apiFetch(`/api/expert/admin/applications/${detail.id}/review`, {
+            method: "PATCH",
+            body: JSON.stringify({ decision, note: note.trim() || undefined }),
+          });
+          closeModal();
+          showToast(setuju ? "Pengajuan disetujui." : "Pengajuan ditolak.");
+          await load();
+        } finally {
+          setBusy(false);
+        }
+      },
+    });
   }
 
   const columns: Column<Application>[] = [
@@ -175,7 +193,7 @@ export default function ExpertApplicationsPage() {
     {
       header: "Status",
       accessor: "status",
-      render: (row) => <Badge variant={statusVariant(row.status)}>{row.status}</Badge>,
+      render: (row) => <Badge variant={statusVariant(row.status)}>{label("expertApplication", row.status)}</Badge>,
     },
     {
       header: "Aksi",
@@ -211,7 +229,7 @@ export default function ExpertApplicationsPage() {
                 : "bg-surface-1 border border-neutral-200 text-text-med hover:text-text-high"
             }`}
           >
-            {s === "ALL" ? "Semua" : s}
+            {s === "ALL" ? "Semua" : label("expertApplication", s)}
           </button>
         ))}
       </div>
@@ -243,7 +261,7 @@ export default function ExpertApplicationsPage() {
                 <h2 className="text-lg font-semibold text-text-high">{detail.user?.name ?? "—"}</h2>
                 <p className="text-text-low text-xs">{detail.user?.email} · {detail.user?.phone ?? "tanpa telepon"}</p>
               </div>
-              <Badge variant={statusVariant(detail.status)}>{detail.status}</Badge>
+              <Badge variant={statusVariant(detail.status)}>{label("expertApplication", detail.status)}</Badge>
             </div>
 
             <div className="mt-4 space-y-3 text-sm">
@@ -334,6 +352,8 @@ export default function ExpertApplicationsPage() {
           </div>
         </div>
       )}
+      {dialog}
+      <Toast state={toast} />
     </div>
   );
 }

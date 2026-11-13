@@ -32,11 +32,11 @@ export function DetailModal({ open, title, subtitle, rows, onClose, footer, chil
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-latar"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg bg-surface-1 rounded-2xl border border-neutral-200 shadow-xl max-h-[85vh] flex flex-col"
+        className="w-full max-w-lg bg-surface-1 rounded-2xl border border-neutral-200 shadow-xl max-h-[85vh] flex flex-col animate-dialog"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

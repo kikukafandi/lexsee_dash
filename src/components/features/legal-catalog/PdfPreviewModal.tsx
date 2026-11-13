@@ -11,7 +11,7 @@ export default function PdfPreviewModal({
   onClose: () => void;
 }) {
   return (
-    <Modal isOpen={open} title={item?.judul || "PDF Preview"} onClose={onClose}>
+    <Modal fullScreen isOpen={open} title={item?.judul || "Pratinjau PDF"} onClose={onClose}>
       {item?.pdfPath ? (
         <iframe
           className="h-full w-full border-0"

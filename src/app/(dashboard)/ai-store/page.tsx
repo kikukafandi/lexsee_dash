@@ -5,7 +5,7 @@ import { Plus, Edit, Trash2, AlertTriangle } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { PageLoader } from "@/components/ui/LoadingSpinner";
 import { Badge } from "@/components/ui/Badge";
-import { ProductForm } from "@/components/features/ai-store/ProductForm";
+import { ProductForm, FEATURE_OPTIONS } from "@/components/features/ai-store/ProductForm";
 import type { AiFeatureProduct } from "@/types";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { Toast, useToast } from "@/components/ui/Toast";
@@ -91,7 +91,7 @@ export default function AiStorePage() {
           <tbody>
             {products.map((p) => (
               <tr key={p.id} className="border-t border-neutral-200">
-                <td className="px-4 py-3 text-text-med font-mono text-xs">{p.featureKey}</td>
+                <td className="px-4 py-3 text-text-med text-sm">{FEATURE_OPTIONS.find((o) => o.value === p.featureKey)?.label ?? p.featureKey}</td>
                 <td className="px-4 py-3 text-text-high">{p.label}</td>
                 <td className="px-4 py-3 text-right text-text-high">
                   {p.featureKey === "plagiarism" ? `${p.quota.toLocaleString("id-ID")} kata` : `${p.quota}x`}

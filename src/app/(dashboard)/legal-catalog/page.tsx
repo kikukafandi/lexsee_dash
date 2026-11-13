@@ -302,6 +302,7 @@ export default function LegalCatalogPage() {
 
       {/* ── PDF Preview Modal ──────────────────────────────────────────── */}
       <Modal
+        fullScreen
         isOpen={!!previewItem}
         onClose={() => setPreviewItem(null)}
         title={previewItem?.judul}

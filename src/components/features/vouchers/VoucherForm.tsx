@@ -142,7 +142,7 @@ export function VoucherForm({ isOpen, onClose, onSuccess, voucher }: Props) {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={isEditMode ? "Edit Voucher" : "Buat Voucher"}>
-      <form onSubmit={handleSubmit(onSubmit)} className="p-6 bg-surface-1 h-full overflow-y-auto">
+      <form onSubmit={handleSubmit(onSubmit)} className="p-6">
         {error && (
           <div className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-danger/10 border border-danger/25 text-danger text-sm">
             <AlertTriangle size={16} />
@@ -243,8 +243,8 @@ export function VoucherForm({ isOpen, onClose, onSuccess, voucher }: Props) {
         </div>
 
         <div className="mt-8 pt-4 border-t border-neutral-100 flex flex-col-reverse sm:flex-row justify-end gap-3">
-          <button type="button" onClick={onClose} className="px-4 py-2 rounded-lg text-sm font-medium text-text-med bg-surface-2 border border-neutral-200 hover:bg-neutral-100 hover:text-gold transition-colors">
-            Kembali
+          <button type="button" onClick={onClose} className="px-4 py-2 text-sm font-medium text-text-med hover:text-text-high transition-colors">
+            Batal
           </button>
           <button type="submit" disabled={isSubmitting} className="px-4 py-2 rounded-lg text-sm font-medium text-surface-1 bg-gold hover:bg-maroon-dark transition-colors disabled:opacity-50 min-w-[140px] flex items-center justify-center">
             {isSubmitting ? <LoadingSpinner size="sm" /> : (isEditMode ? "Simpan Perubahan" : "Buat Voucher")}

@@ -175,9 +175,9 @@ export default function MembershipPage() {
       <section>
         <div className="flex items-center justify-between gap-3 mb-4">
           <h2 className="text-2xl font-serif text-text-high">Paket Langganan</h2>
-          <button onClick={() => handleOpenForm()} className="btn btn-primary btn-sm">
+          <button onClick={() => handleOpenForm()} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-maroon text-white text-sm font-semibold hover:bg-maroon-dark transition-colors shrink-0">
             <Plus size={16} />
-            Buat Plan Baru
+            Tambah paket
           </button>
         </div>
 
@@ -253,11 +253,11 @@ export default function MembershipPage() {
 
                   {/* Admin Actions */}
                   <div className="mt-auto pt-4 border-t border-neutral-100 flex items-center justify-end gap-2">
-                     <button onClick={() => handleOpenForm(plan)} className="btn btn-ghost btn-sm text-text-med hover:bg-neutral-100 hover:text-gold">
+                     <button onClick={() => handleOpenForm(plan)} className="inline-flex items-center gap-1.5 px-2 py-1 text-sm text-text-med hover:text-text-high transition-colors">
                        <Edit size={14} />
                        Edit
                      </button>
-                     <button onClick={() => handleDelete(plan.id)} className="btn btn-ghost btn-sm text-danger/70 hover:bg-danger/10 hover:text-danger">
+                     <button onClick={() => handleDelete(plan.id)} className="inline-flex items-center gap-1.5 px-2 py-1 text-sm text-danger/80 hover:text-danger transition-colors">
                        <Trash2 size={14} />
                        Hapus
                      </button>

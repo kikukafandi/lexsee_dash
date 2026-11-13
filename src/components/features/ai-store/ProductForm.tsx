@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/Checkbox";
 import { AlertTriangle, Plus, X } from "lucide-react";
 import type { AiFeatureProduct, AiFeatureKey } from "@/types";
 
-const FEATURE_OPTIONS: { value: AiFeatureKey; label: string }[] = [
+export const FEATURE_OPTIONS: { value: AiFeatureKey; label: string }[] = [
   { value: "opinion", label: "AI Legal Opinion" },
   { value: "analyze-expert", label: "AI Analisis Pendapat Ahli" },
   { value: "compare", label: "AI Perbandingan" },
@@ -154,7 +154,7 @@ export function ProductForm({ isOpen, onClose, onSuccess, product }: ProductForm
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} title={isEditMode ? "Edit Paket Kuota" : "Buat Paket Kuota"}>
-      <form onSubmit={handleSubmit(onSubmit)} className="p-6 bg-surface-1 h-full overflow-y-auto">
+      <form onSubmit={handleSubmit(onSubmit)} className="p-6">
         {error && (
           <div className="flex items-center gap-2 p-3 mb-4 rounded-lg bg-danger/10 border border-danger/25 text-danger text-sm">
             <AlertTriangle size={16} />
@@ -177,7 +177,7 @@ export function ProductForm({ isOpen, onClose, onSuccess, product }: ProductForm
 
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-high">Label Paket</label>
-            <input {...register("label")} className={inputCls} placeholder="e.g. Analisis Putusan 10x" />
+            <input {...register("label")} className={inputCls} placeholder="Contoh: Analisis Putusan 10x" />
             {errors.label && <p className="text-xs text-danger">{errors.label.message}</p>}
           </div>
 
@@ -235,7 +235,7 @@ export function ProductForm({ isOpen, onClose, onSuccess, product }: ProductForm
                 type="button"
                 onClick={() => tambahExtra({ featureKey: "ai-detect", quota: 1000 })}
                 disabled={extras.length >= 10}
-                className="flex items-center gap-1 px-2.5 py-1 text-xs rounded-lg border border-neutral-200 text-text-med hover:bg-surface-2 disabled:opacity-50"
+                className="flex items-center gap-1 py-1 text-xs font-medium text-maroon hover:text-maroon-dark disabled:opacity-50"
               >
                 <Plus size={13} /> Tambah fitur
               </button>
@@ -297,7 +297,7 @@ export function ProductForm({ isOpen, onClose, onSuccess, product }: ProductForm
 
         <div className="flex justify-end gap-3 mt-6">
           <button type="button" onClick={onClose}
-            className="px-4 py-2 text-sm rounded-lg border border-neutral-200 text-text-med hover:bg-surface-2">
+            className="px-4 py-2 text-sm font-medium text-text-med hover:text-text-high transition-colors">
             Batal
           </button>
           <button type="submit" disabled={isSubmitting}

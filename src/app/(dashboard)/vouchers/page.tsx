@@ -92,7 +92,7 @@ export default function VouchersPage() {
             Kelola kode diskon. Diskon diterapkan sebelum pajak saat checkout.
           </p>
         </div>
-        <button onClick={() => openForm()} className="btn btn-primary btn-sm shrink-0">
+        <button onClick={() => openForm()} className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-maroon text-white text-sm font-semibold hover:bg-maroon-dark transition-colors shrink-0">
           <Plus size={16} />
           Buat Voucher
         </button>
@@ -139,10 +139,10 @@ export default function VouchersPage() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-1">
-                      <button onClick={() => openForm(v)} className="btn btn-ghost btn-sm text-text-med hover:bg-neutral-100 hover:text-gold">
+                      <button onClick={() => openForm(v)} className="inline-flex items-center gap-1.5 px-2 py-1 text-sm text-text-med hover:text-text-high transition-colors">
                         <Edit size={14} />
                       </button>
-                      <button onClick={() => handleDelete(v)} className="btn btn-ghost btn-sm text-danger/70 hover:bg-danger/10 hover:text-danger">
+                      <button onClick={() => handleDelete(v)} className="inline-flex items-center gap-1.5 px-2 py-1 text-sm text-danger/80 hover:text-danger transition-colors">
                         <Trash2 size={14} />
                       </button>
                     </div>

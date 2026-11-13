@@ -75,7 +75,7 @@ function ConfirmDialog({ opts, onClose }: { opts: ConfirmOptions; onClose: () =>
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40"
+      className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 animate-latar"
       onClick={(e) => {
         // Jangan sampai klik latar ikut sampai ke baris tabel di belakang dialog.
         e.stopPropagation();
@@ -87,7 +87,7 @@ function ConfirmDialog({ opts, onClose }: { opts: ConfirmOptions; onClose: () =>
         aria-modal="true"
         aria-labelledby="confirm-title"
         aria-describedby="confirm-msg"
-        className="w-full max-w-md rounded-xl bg-surface-1 border border-neutral-200 shadow-xl p-5"
+        className="w-full max-w-md rounded-xl bg-surface-1 border border-neutral-200 shadow-xl p-5 animate-dialog"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 id="confirm-title" className="text-base font-semibold text-text-high">

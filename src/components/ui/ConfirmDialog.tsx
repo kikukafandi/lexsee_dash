@@ -76,7 +76,11 @@ function ConfirmDialog({ opts, onClose }: { opts: ConfirmOptions; onClose: () =>
   return (
     <div
       className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40"
-      onClick={() => !busy && onClose()}
+      onClick={(e) => {
+        // Jangan sampai klik latar ikut sampai ke baris tabel di belakang dialog.
+        e.stopPropagation();
+        if (!busy) onClose();
+      }}
     >
       <div
         role="alertdialog"

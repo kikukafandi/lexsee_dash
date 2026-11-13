@@ -79,7 +79,17 @@ export function DataTable<T extends { id?: string }>({
               data.map((row, rowIndex) => (
                 <tr
                   key={row.id ?? rowIndex}
-                  onClick={onRowClick ? () => onRowClick(row) : undefined}
+                  // Klik dari kontrol di dalam baris (tombol aksi, dialog yang
+                  // dirender di dalamnya) bukan klik baris.
+                  onClick={
+                    onRowClick
+                      ? (e) => {
+                          const t = e.target as Element;
+                          if (t.closest("button, a, input, textarea, [role=dialog], [role=alertdialog]")) return;
+                          onRowClick(row);
+                        }
+                      : undefined
+                  }
                   // [WEB-06] Baris yang bisa diklik dulu hanya merespons mouse:
                   // tidak bisa di-Tab, tidak bisa ditekan Enter, dan pembaca layar
                   // tidak mengumumkannya sebagai sesuatu yang dapat diaktifkan.
@@ -89,6 +99,9 @@ export function DataTable<T extends { id?: string }>({
                   onKeyDown={
                     onRowClick
                       ? (e) => {
+                          // Hanya saat baris itu sendiri yang fokus; tombol dan
+                          // kolom isian di dalamnya menangani Enter/Spasi sendiri.
+                          if (e.target !== e.currentTarget) return;
                           if (e.key === "Enter" || e.key === " ") {
                             // Spasi default-nya menggulirkan halaman.
                             e.preventDefault();

@@ -13,6 +13,7 @@ test("kode dikenal", () => {
   assert.equal(label("consultation", "AWAITING_EXPERT"), "Menunggu jawaban");
   assert.equal(label("expertApplication", "PENDING"), "Menunggu tinjauan");
   assert.equal(label("docType", "PP"), "Peraturan Pemerintah (PP)");
+  for (const k of ["PERPRES", "PERMEN", "KEPRES", "KEPMENKO", "KEPPRES"]) assert.doesNotMatch(label("docType", k), /tidak dikenal/);
 });
 
 test("kode tidak dikenal tetap terbaca", () => {

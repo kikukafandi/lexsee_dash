@@ -87,6 +87,6 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     // Aset statis tidak butuh nonce maupun bearer.
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.png$).*)",
   ],
 };

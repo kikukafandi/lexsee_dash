@@ -52,7 +52,7 @@ type NotifMeta = {
 };
 
 const PAYMENTS: NotifAction = { label: "Lihat Pembayaran", url: "/payments" };
-const INVOICES: NotifAction = { label: "Lihat Invoice", url: "/billing-invoices" };
+const INVOICES: NotifAction = { label: "Lihat Pembayaran", url: "/payments" };
 const ORDERS: NotifAction = { label: "Lihat Pesanan", url: "/orders" };
 const ACCOUNTS: NotifAction = { label: "Periksa Akun", url: "/users" };
 

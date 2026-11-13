@@ -8,7 +8,7 @@ import { apiFetch } from "@/lib/api";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
-import { ThumbsUp, ThumbsDown, CheckCircle2, XCircle, Hourglass } from "lucide-react";
+import { ThumbsUp, ThumbsDown, CheckCircle2, XCircle, Hourglass, ChevronRight } from "lucide-react";
 import ScrapePanel from "@/components/features/knowledge-base/ScrapePanel";
 import type { KbStats, LegalDocument, DocumentListResponse, DocType } from "@/types";
 import { Select } from "@/components/ui/Select";
@@ -28,7 +28,7 @@ const DOC_TYPE_OPTIONS: { value: DocType; label: string }[] = [
 
 // ─── Stats row component ────────────────────────────────────────────────────
 
-function StatsRow({ stats }: { stats: KbStats | null }) {
+function StatsRow({ stats, lengkap = false }: { stats: KbStats | null; lengkap?: boolean }) {
   if (!stats) return null;
 
   const helpfulRate =
@@ -40,18 +40,21 @@ function StatsRow({ stats }: { stats: KbStats | null }) {
         )
       : 0;
 
-  const items: { label: ReactNode; value: number | string; color: string }[] = [
-    { label: "Dokumen Aktif", value: stats.documents.active, color: "text-gold" },
-    { label: "Total Dokumen", value: stats.documents.total, color: "text-text-high" },
-    { label: "Vector Chunks", value: stats.chunks, color: "text-gold" },
-    { label: "Sesi Chat", value: stats.sessions, color: "text-text-high" },
-    { label: <span className="flex justify-center items-center gap-1">Feedback Positif <ThumbsUp size={12}/></span>, value: stats.feedback.helpful, color: "text-success" },
-    { label: <span className="flex justify-center items-center gap-1">Feedback Negatif <ThumbsDown size={12}/></span>, value: stats.feedback.notHelpful, color: "text-danger" },
-    { label: "Tingkat Kepuasan", value: `${helpfulRate}%`, color: helpfulRate >= 70 ? "text-success" : "text-warning" },
+  const ringkas: { label: ReactNode; value: number | string; color: string }[] = [
+    { label: "Dokumen aktif", value: stats.documents.active, color: "text-gold" },
+    { label: "Total dokumen", value: stats.documents.total, color: "text-text-high" },
+    { label: "Tingkat kepuasan jawaban AI", value: `${helpfulRate}%`, color: helpfulRate >= 70 ? "text-success" : "text-warning" },
   ];
+  const teknis: { label: ReactNode; value: number | string; color: string }[] = [
+    { label: "Potongan teks (vector chunks)", value: stats.chunks, color: "text-gold" },
+    { label: "Sesi chat", value: stats.sessions, color: "text-text-high" },
+    { label: <span className="flex justify-center items-center gap-1">Jawaban membantu <ThumbsUp size={12}/></span>, value: stats.feedback.helpful, color: "text-success" },
+    { label: <span className="flex justify-center items-center gap-1">Jawaban kurang tepat <ThumbsDown size={12}/></span>, value: stats.feedback.notHelpful, color: "text-danger" },
+  ];
+  const items = lengkap ? teknis : ringkas;
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+    <div className={`grid grid-cols-2 gap-3 ${lengkap ? "sm:grid-cols-4" : "sm:grid-cols-3"}`}>
       {items.map((item, i) => (
         <div key={i} className="bg-surface-1 border border-neutral-200 rounded-xl p-3 text-center">
           <p className={`text-2xl font-serif font-bold ${item.color}`}>{item.value}</p>
@@ -66,8 +69,8 @@ function StatsRow({ stats }: { stats: KbStats | null }) {
 
 type IngestTab = "jdih" | "manual" | "setneg" | "reingest";
 
-function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
-  const [tab, setTab] = useState<IngestTab>("jdih");
+function IngestPanel({ onSuccess, lanjutan = false }: { onSuccess: () => void; lanjutan?: boolean }) {
+  const [tab, setTab] = useState<IngestTab>(lanjutan ? "jdih" : "manual");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
   const [error, setError] = useState("");
@@ -82,12 +85,13 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
   const [manualType, setManualType] = useState<DocType>("UU");
   const [manualText, setManualText] = useState("");
 
-  const tabs: { id: IngestTab; label: string }[] = [
-    { id: "jdih", label: "Auto Scrape (JDIH)" },
-    { id: "manual", label: "Upload Manual" },
-    { id: "setneg", label: "Sync Setneg" },
-    { id: "reingest", label: "Re-ingest Lokal" },
-  ];
+  const tabs: { id: IngestTab; label: string }[] = lanjutan
+    ? [
+        { id: "jdih", label: "Ambil dari JDIH MA" },
+        { id: "setneg", label: "Sinkron JDIH Setneg" },
+        { id: "reingest", label: "Proses ulang berkas lokal" },
+      ]
+    : [];
 
   async function runIngest() {
     setLoading(true);
@@ -127,10 +131,12 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
 
   return (
     <div className="bg-surface-1 border border-neutral-200 rounded-xl p-5">
-      <h2 className="text-text-high font-serif text-lg mb-4">Tambah Dokumen ke Knowledge Base</h2>
+      <h2 className="text-text-high font-serif text-lg mb-4">
+        {lanjutan ? "Ambil dokumen otomatis" : "Tambah dokumen"}
+      </h2>
 
       {/* Tab buttons */}
-      <div className="flex gap-1 mb-5 flex-wrap">
+      <div className={`flex gap-1 flex-wrap ${tabs.length ? "mb-5" : ""}`}>
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -172,7 +178,7 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
       {/* Tab: Manual Upload */}
       {tab === "manual" && (
         <div className="space-y-3">
-          <p className="text-text-med text-xs">Upload teks dokumen secara manual. Cocok untuk dokumen internal.</p>
+          <p className="text-text-med text-xs">Tempel teks dokumen hukum, misalnya peraturan atau dokumen internal. AI akan memakainya untuk menjawab.</p>
           <input
             value={manualTitle}
             onChange={(e) => setManualTitle(e.target.value)}
@@ -184,7 +190,7 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
             value={manualText}
             onChange={(e) => setManualText(e.target.value)}
             rows={5}
-            placeholder="Paste teks dokumen hukum di sini..."
+            placeholder="Tempel teks dokumen di sini…"
             className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon resize-y"
           />
         </div>
@@ -218,7 +224,7 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
         disabled={loading || (tab === "manual" && (!manualTitle || !manualText))}
         className="mt-4 w-full py-2.5 rounded-lg bg-gold text-white font-semibold text-sm hover:bg-gold-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
-        {loading ? <><LoadingSpinner size="sm" /> Memproses...</> : "Jalankan"}
+        {loading ? <><LoadingSpinner size="sm" /> Memproses...</> : tab === "manual" ? "Simpan dokumen" : "Jalankan"}
       </button>
 
       {/* Result/error messages */}
@@ -241,6 +247,7 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
 export default function KnowledgeBasePage() {
   const { confirm, dialog } = useConfirm();
   const { toast, showToast } = useToast();
+  const [lanjutan, setLanjutan] = useState(false);
   const [stats, setStats] = useState<KbStats | null>(null);
   const [docs, setDocs] = useState<LegalDocument[]>([]);
   const [docsPage, setDocsPage] = useState(1);
@@ -298,7 +305,6 @@ export default function KnowledgeBasePage() {
       render: (row) => (
         <div>
           <p className="text-text-high font-medium text-sm">{row.title}</p>
-          <p className="text-text-low text-xs">{row.id.slice(0, 8)}...</p>
         </div>
       ),
       width: "w-2/5",
@@ -306,14 +312,16 @@ export default function KnowledgeBasePage() {
     {
       header: "Tipe",
       accessor: "type",
-      render: (row) => <Badge variant="info">{label("docType", row.type)}</Badge>,
-    },
-    {
-      header: "Chunks",
-      accessor: "_count",
-      render: (row) => (
-        <Badge variant="default">{row._count?.chunks ?? 0} chunks</Badge>
-      ),
+      // Singkatan resmi (UU, PP) dipakai di tabel supaya kolom tidak melebar; nama lengkap di tooltip.
+      render: (row) => {
+        const lengkap = label("docType", row.type);
+        const singkat = lengkap.match(/\(([^)]+)\)$/)?.[1] ?? lengkap;
+        return (
+          <span title={lengkap}>
+            <Badge variant="info" className="whitespace-nowrap">{singkat}</Badge>
+          </span>
+        );
+      },
     },
     {
       header: "Status",
@@ -354,36 +362,25 @@ export default function KnowledgeBasePage() {
     <div className="space-y-6">
       {/* ── Page header ──────────────────────────────────────────────── */}
       <div>
-        <h1 className="text-2xl font-serif text-text-high">Knowledge Base</h1>
+        <h1 className="text-2xl font-serif text-text-high">Basis Pengetahuan AI</h1>
         <p className="text-text-med text-sm mt-0.5">
-          Kelola dokumen hukum untuk AI Lexsy. Dokumen di-embed ke pgvector untuk RAG.
+          Dokumen hukum yang dipakai AI Lexsy untuk menjawab pertanyaan pengguna.
         </p>
       </div>
 
-      {/* ── Stats row ─────────────────────────────────────────────────── */}
       <StatsRow stats={stats} />
 
-      {/* ── Scraping multi-sumber ─────────────────────────────────────── */}
-      <div>
-        <h2 className="text-text-high font-serif text-lg mb-1">Scraping Multi-Sumber</h2>
-        <p className="text-text-med text-sm mb-4">
-          Ambil katalog dulu, lalu proses (download + ekstrak). Embedding bisa ditunda dan dijalankan massal lewat
-          tombol <span className="text-gold">Embed Pending</span>.
-        </p>
-        <ScrapePanel onChanged={() => { loadStats(); loadDocs(1); }} />
-      </div>
-
       {/* ── 2-column layout: doc list + ingest form ────────────────── */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-[3fr_2fr] gap-6 items-start">
         {/* Document list */}
-        <div className="bg-surface-1 border border-neutral-200 rounded-xl overflow-hidden">
+        <div className="bg-surface-1 border border-neutral-200 rounded-xl overflow-x-auto min-w-0">
           <div className="flex items-center justify-between px-5 py-3 border-b border-neutral-200">
-            <h2 className="text-text-high font-serif text-lg">Daftar Dokumen</h2>
+            <h2 className="text-text-high font-serif text-lg">Daftar dokumen</h2>
             <button
               onClick={() => { loadDocs(1); loadStats(); }}
               className="text-text-low hover:text-gold text-xs transition-colors"
             >
-              ↻ Refresh
+              Muat ulang
             </button>
           </div>
           <DataTable
@@ -394,12 +391,42 @@ export default function KnowledgeBasePage() {
             totalPages={totalPages}
             onPageChange={(p) => { setDocsPage(p); loadDocs(p); }}
             emptyMessage="Belum ada dokumen"
-            emptyDescription="Gunakan form di samping untuk menambah dokumen ke knowledge base."
+            emptyDescription="Tambahkan dokumen lewat form di samping."
           />
         </div>
 
         {/* Ingest panel */}
         <IngestPanel onSuccess={() => { loadDocs(1); loadStats(); }} />
+      </div>
+
+      {/* ── Pengaturan lanjutan (untuk developer) ─────────────────────── */}
+      <div>
+        <button
+          type="button"
+          onClick={() => setLanjutan((v) => !v)}
+          aria-expanded={lanjutan}
+          className="flex items-center gap-1.5 text-sm font-medium text-text-med hover:text-text-high transition-colors py-2"
+        >
+          <ChevronRight size={16} className={`transition-transform ${lanjutan ? "rotate-90" : ""}`} aria-hidden="true" />
+          Pengaturan lanjutan
+        </button>
+        <p className="text-text-low text-xs">
+          Pengambilan otomatis dari sumber resmi dan statistik teknis. Biasanya dipakai developer.
+        </p>
+        {lanjutan && (
+          <div className="mt-4 space-y-6">
+            <StatsRow stats={stats} lengkap />
+            <IngestPanel lanjutan onSuccess={() => { loadDocs(1); loadStats(); }} />
+            <div>
+              <h2 className="text-text-high font-serif text-lg mb-1">Pengambilan dari banyak sumber</h2>
+              <p className="text-text-med text-sm mb-4">
+                Ambil katalog dulu, lalu proses (unduh dan ekstrak). Penyiapan untuk AI bisa ditunda lalu dijalankan
+                sekaligus lewat tombol <span className="text-gold">Embed Pending</span>.
+              </p>
+              <ScrapePanel onChanged={() => { loadStats(); loadDocs(1); }} />
+            </div>
+          </div>
+        )}
       </div>
       {dialog}
       <Toast state={toast} />

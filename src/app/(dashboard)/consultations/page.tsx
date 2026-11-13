@@ -11,6 +11,7 @@ import { apiFetch } from "@/lib/api";
 import { DataTable, Column } from "@/components/ui/DataTable";
 import { Badge } from "@/components/ui/Badge";
 import { Modal } from "@/components/ui/Modal";
+import { Select } from "@/components/ui/Select";
 
 type Topic = "KONSULTASI_HUKUM" | "BANTUAN_HUKUM" | "PENDAMPINGAN_SKRIPSI";
 type Status =
@@ -387,17 +388,16 @@ export default function ConsultationsPage() {
           </button>
         ))}
         {tab === "transaksi" && (
-          <select
-            aria-label="Filter status"
+          <Select<Status | "">
+            label="Filter status"
+            className="ml-auto mb-1 w-56"
             value={filter}
-            onChange={(e) => setFilter(e.target.value as Status | "")}
-            className={`${inputCls} ml-auto mb-1 max-w-[14rem]`}
-          >
-            <option value="">Semua (kecuali belum dibayar)</option>
-            {(Object.keys(STATUS_LABEL) as Status[]).map((s) => (
-              <option key={s} value={s}>{STATUS_LABEL[s]}</option>
-            ))}
-          </select>
+            onChange={setFilter}
+            options={[
+              { value: "", label: "Semua (kecuali belum dibayar)" },
+              ...(Object.keys(STATUS_LABEL) as Status[]).map((s) => ({ value: s, label: STATUS_LABEL[s] })),
+            ]}
+          />
         )}
       </div>
 

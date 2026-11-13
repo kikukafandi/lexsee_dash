@@ -10,6 +10,7 @@ import { apiFetch } from "@/lib/api";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { MarkdownRenderer } from "@/components/ui/MarkdownRenderer";
 import type { ChatResponse } from "@/types";
+import { Select } from "@/components/ui/Select";
 
 // ─── Tab type ──────────────────────────────────────────────────────────────
 
@@ -118,19 +119,16 @@ function PushNotifTester() {
           </div>
           <div>
             <label className="block text-text-low text-xs uppercase tracking-wider mb-1">Target Pengguna</label>
-            <select
+            <Select
+              label="Target pengguna"
               value={selectedUserId}
-              onChange={(e) => setSelectedUserId(e.target.value)}
+              onChange={setSelectedUserId}
               disabled={usersLoading || !!fcmToken.trim()}
-              className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon disabled:opacity-50"
-            >
-              <option value="">Broadcast (semua pengguna)</option>
-              {users.map((u) => (
-                <option key={u.id} value={u.id}>
-                  {u.name || u.email} — {u.email}
-                </option>
-              ))}
-            </select>
+              options={[
+                { value: "", label: "Broadcast (semua pengguna)" },
+                ...users.map((u) => ({ value: u.id, label: `${u.name || u.email} — ${u.email}` })),
+              ]}
+            />
             {usersLoading && <p className="text-text-low text-xs mt-1">Memuat daftar pengguna...</p>}
           </div>
           <div>
@@ -564,15 +562,7 @@ function GenerateDoc() {
       <p className="text-text-low text-xs">Generate dokumen hukum berdasarkan template. AI mengisi template tanpa mengubah struktur atau menginvent klausul baru.</p>
       <div>
         <label className="block text-text-low text-xs uppercase tracking-wider mb-1">Tipe Dokumen</label>
-        <select
-          value={docType}
-          onChange={(e) => setDocType(e.target.value)}
-          className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
-        >
-          {DOC_TYPES.map((dt) => (
-            <option key={dt.value} value={dt.value}>{dt.label}</option>
-          ))}
-        </select>
+        <Select label="Tipe dokumen" value={docType} onChange={setDocType} options={DOC_TYPES} />
       </div>
 
       {["pihak1", "pihak2", "perihal", "durasi", "lokasi", "tanggal"].map((key) => (
@@ -1553,15 +1543,13 @@ function ApiTester() {
       {/* Request panel */}
       <div className="space-y-3">
         <div className="flex gap-2">
-          <select
+          <Select
+            label="Metode"
+            className="w-28"
             value={method}
-            onChange={(e) => setMethod(e.target.value)}
-            className="bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon w-28"
-          >
-            {["GET", "POST", "PATCH", "DELETE"].map((m) => (
-              <option key={m} value={m}>{m}</option>
-            ))}
-          </select>
+            onChange={setMethod}
+            options={["GET", "POST", "PATCH", "DELETE"].map((m) => ({ value: m, label: m }))}
+          />
           <input
             list="endpoints"
             value={endpoint}

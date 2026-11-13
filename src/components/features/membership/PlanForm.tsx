@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { apiFetch } from "@/lib/api";
 import { Modal } from "@/components/ui/Modal";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { Select } from "@/components/ui/Select";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { AlertTriangle } from "lucide-react";
 import type { MembershipPlan } from "@/types";
 
@@ -39,6 +41,7 @@ export function PlanForm({ isOpen, onClose, onSuccess, plan }: PlanFormProps) {
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    control,
   } = useForm({
     resolver: zodResolver(planSchema),
     defaultValues: {
@@ -121,13 +124,21 @@ export function PlanForm({ isOpen, onClose, onSuccess, plan }: PlanFormProps) {
           {/* Duration */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-high">Durasi</label>
-            <select 
-              {...register("duration")} 
-              className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-sm text-text-high focus:outline-none focus:border-maroon focus:ring-1 focus:ring-gold/50 transition-colors"
-            >
-              <option value="MONTHLY">Bulanan (Monthly)</option>
-              <option value="YEARLY">Tahunan (Yearly)</option>
-            </select>
+            <Controller
+              control={control}
+              name="duration"
+              render={({ field }) => (
+                <Select
+                  label="Durasi"
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={[
+                    { value: "MONTHLY", label: "Bulanan" },
+                    { value: "YEARLY", label: "Tahunan" },
+                  ]}
+                />
+              )}
+            />
           </div>
 
           {/* Price */}
@@ -180,41 +191,23 @@ export function PlanForm({ isOpen, onClose, onSuccess, plan }: PlanFormProps) {
 
         {/* Toggles */}
         <div className="mt-6 p-4 rounded-lg bg-surface-2 border border-neutral-100 flex flex-col sm:flex-row gap-6">
-          <label className="flex items-center gap-3 cursor-pointer group">
-            <div className="relative flex items-center">
-              <input 
-                type="checkbox" 
-                {...register("isPopular")} 
-                className="peer shrink-0 w-5 h-5 border-2 border-neutral-300 rounded focus:outline-none focus:ring-2 focus:ring-gold/20 focus:ring-offset-0 bg-transparent checked:bg-gold checked:border-gold appearance-none transition-colors" 
-              />
-              <svg className="absolute left-[3px] top-[3px] w-3.5 h-3.5 text-surface-1 pointer-events-none opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-text-high group-hover:text-gold transition-colors">Tandai Populer</span>
-              <span className="text-xs text-text-low">Berikan badge populer di plan ini</span>
-            </div>
-          </label>
+          <Controller
+            control={control}
+            name="isPopular"
+            render={({ field }) => (
+              <Checkbox checked={!!field.value} onChange={field.onChange} label="Tandai populer" description="Tampilkan label populer di paket ini" />
+            )}
+          />
           
           <div className="w-px bg-gold/10 hidden sm:block"></div>
 
-          <label className="flex items-center gap-3 cursor-pointer group">
-            <div className="relative flex items-center">
-              <input 
-                type="checkbox" 
-                {...register("isActive")} 
-                className="peer shrink-0 w-5 h-5 border-2 border-neutral-300 rounded focus:outline-none focus:ring-2 focus:ring-gold/20 focus:ring-offset-0 bg-transparent checked:bg-gold checked:border-gold appearance-none transition-colors" 
-              />
-              <svg className="absolute left-[3px] top-[3px] w-3.5 h-3.5 text-surface-1 pointer-events-none opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium text-text-high group-hover:text-gold transition-colors">Plan Aktif</span>
-              <span className="text-xs text-text-low">Plan bisa digunakan oleh user</span>
-            </div>
-          </label>
+          <Controller
+            control={control}
+            name="isActive"
+            render={({ field }) => (
+              <Checkbox checked={!!field.value} onChange={field.onChange} label="Paket aktif" description="Paket bisa dibeli pengguna" />
+            )}
+          />
         </div>
 
         {/* Actions */}

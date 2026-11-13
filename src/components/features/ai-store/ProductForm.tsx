@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm, useWatch, useFieldArray, SubmitHandler } from "react-hook-form";
+import { useForm, useWatch, useFieldArray, Controller, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { apiFetch } from "@/lib/api";
 import { Modal } from "@/components/ui/Modal";
+import { Select } from "@/components/ui/Select";
+import { Checkbox } from "@/components/ui/Checkbox";
 import { AlertTriangle, Plus, X } from "lucide-react";
 import type { AiFeatureProduct, AiFeatureKey } from "@/types";
 
@@ -163,11 +165,13 @@ export function ProductForm({ isOpen, onClose, onSuccess, product }: ProductForm
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-high">Fitur</label>
-            <select {...register("featureKey")} className={inputCls}>
-              {FEATURE_OPTIONS.map((o) => (
-                <option key={o.value} value={o.value}>{o.label}</option>
-              ))}
-            </select>
+            <Controller
+              control={control}
+              name="featureKey"
+              render={({ field }) => (
+                <Select label="Fitur" value={field.value} onChange={field.onChange} options={FEATURE_OPTIONS} />
+              )}
+            />
             {errors.featureKey && <p className="text-xs text-danger">{errors.featureKey.message}</p>}
           </div>
 
@@ -243,11 +247,19 @@ export function ProductForm({ isOpen, onClose, onSuccess, product }: ProductForm
             </p>
             {extras.map((f, i) => (
               <div key={f.id} className="flex items-center gap-2">
-                <select {...register(`extras.${i}.featureKey`)} className={inputCls}>
-                  {FEATURE_OPTIONS.map((o) => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
-                  ))}
-                </select>
+                <Controller
+                  control={control}
+                  name={`extras.${i}.featureKey`}
+                  render={({ field }) => (
+                    <Select
+                      label="Fitur tambahan"
+                      value={field.value}
+                      onChange={field.onChange}
+                      options={FEATURE_OPTIONS}
+                      className="flex-1"
+                    />
+                  )}
+                />
                 <input
                   type="number"
                   {...register(`extras.${i}.quota`)}
@@ -258,7 +270,7 @@ export function ProductForm({ isOpen, onClose, onSuccess, product }: ProductForm
                   type="button"
                   onClick={() => hapusExtra(i)}
                   aria-label="Hapus fitur tambahan"
-                  className="p-2 rounded-lg border border-neutral-200 text-text-med hover:bg-surface-2"
+                  className="p-2 text-text-med hover:text-danger transition-colors"
                 >
                   <X size={14} />
                 </button>
@@ -269,10 +281,18 @@ export function ProductForm({ isOpen, onClose, onSuccess, product }: ProductForm
             )}
           </div>
 
-          <label className="flex items-center gap-2 text-sm text-text-high md:col-span-2">
-            <input type="checkbox" {...register("isActive")} className="accent-maroon" />
-            Aktif (tampil di aplikasi)
-          </label>
+          <Controller
+            control={control}
+            name="isActive"
+            render={({ field }) => (
+              <Checkbox
+                className="md:col-span-2"
+                checked={!!field.value}
+                onChange={field.onChange}
+                label="Aktif (tampil di aplikasi)"
+              />
+            )}
+          />
         </div>
 
         <div className="flex justify-end gap-3 mt-6">

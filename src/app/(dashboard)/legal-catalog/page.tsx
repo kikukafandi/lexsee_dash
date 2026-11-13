@@ -11,6 +11,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Modal } from "@/components/ui/Modal";
 import { RefreshCw, CheckCircle2, XCircle, Hourglass } from "lucide-react";
 import type { Peraturan, PeraturanListResponse } from "@/types";
+import { Select } from "@/components/ui/Select";
 
 // Maps a jenis (regulation type) code to a Badge variant
 function jenisVariant(code: string) {
@@ -215,20 +216,21 @@ export default function LegalCatalogPage() {
             <label className="block text-text-low text-xs uppercase tracking-wider mb-1">
               Jenis
             </label>
-            <select
+            <Select
+              label="Jenis"
               value={jenis}
-              onChange={(e) => setJenis(e.target.value)}
-              className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon transition-colors"
-            >
-              <option value="">Semua</option>
-              <option value="UU">UU</option>
-              <option value="PERPU">PERPU</option>
-              <option value="PP">PP</option>
-              <option value="PERPRES">PERPRES</option>
-              <option value="PERMEN">PERMEN</option>
-              <option value="KEPRES">KEPRES</option>
-              <option value="LAINNYA">Lainnya</option>
-            </select>
+              onChange={setJenis}
+              options={[
+                { value: "", label: "Semua" },
+                { value: "UU", label: "Undang-Undang" },
+                { value: "PERPU", label: "PERPU" },
+                { value: "PP", label: "Peraturan Pemerintah" },
+                { value: "PERPRES", label: "Peraturan Presiden" },
+                { value: "PERMEN", label: "Peraturan Menteri" },
+                { value: "KEPRES", label: "Keputusan Presiden" },
+                { value: "LAINNYA", label: "Lainnya" },
+              ]}
+            />
           </div>
 
           {/* Year filter */}

@@ -10,6 +10,7 @@ import { Badge, roleVariant } from "@/components/ui/Badge";
 import { DataTable, type Column } from "@/components/ui/DataTable";
 import { PageLoader } from "@/components/ui/LoadingSpinner";
 import type { AdminUser, AdminUsersResponse } from "@/types";
+import { Select } from "@/components/ui/Select";
 
 const PAGE_SIZE = 20;
 
@@ -219,17 +220,19 @@ export default function UsersPage() {
           />
 
           {/* Tier filter */}
-          <select
+          <Select<MembershipFilter>
+            label="Filter keanggotaan"
+            className="sm:w-48"
             value={tierFilter}
-            onChange={(e) => setTierFilter(e.target.value as MembershipFilter)}
-            className="bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
-          >
-            <option value="ALL">Semua Tier</option>
-            <option value="FREE">FREE</option>
-            <option value="SILVER">SILVER</option>
-            <option value="GOLD">GOLD</option>
-            <option value="PLATINUM">PLATINUM</option>
-          </select>
+            onChange={setTierFilter}
+            options={[
+              { value: "ALL", label: "Semua keanggotaan" },
+              { value: "FREE", label: "Gratis" },
+              { value: "SILVER", label: "Silver" },
+              { value: "GOLD", label: "Gold" },
+              { value: "PLATINUM", label: "Platinum" },
+            ]}
+          />
         </div>
 
         {/* Filtered count */}

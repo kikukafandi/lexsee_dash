@@ -11,6 +11,7 @@ import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { ThumbsUp, ThumbsDown, CheckCircle2, XCircle, Hourglass } from "lucide-react";
 import ScrapePanel from "@/components/features/knowledge-base/ScrapePanel";
 import type { KbStats, LegalDocument, DocumentListResponse, DocType } from "@/types";
+import { Select } from "@/components/ui/Select";
 
 // The document type options available for ingestion
 const DOC_TYPE_OPTIONS: { value: DocType; label: string }[] = [
@@ -153,13 +154,7 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
             className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
           />
           <div className="flex gap-3">
-            <select
-              value={jdihType}
-              onChange={(e) => setJdihType(e.target.value as DocType)}
-              className="flex-1 bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
-            >
-              {DOC_TYPE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-            </select>
+            <Select<DocType> label="Jenis dokumen" className="flex-1" value={jdihType} onChange={setJdihType} options={DOC_TYPE_OPTIONS} />
             <input
               type="number"
               min={1} max={10}
@@ -181,13 +176,7 @@ function IngestPanel({ onSuccess }: { onSuccess: () => void }) {
             placeholder="Judul dokumen"
             className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
           />
-          <select
-            value={manualType}
-            onChange={(e) => setManualType(e.target.value as DocType)}
-            className="w-full bg-surface-2 border border-neutral-200 rounded-lg px-3 py-2 text-text-high text-sm focus:outline-none focus:border-maroon"
-          >
-            {DOC_TYPE_OPTIONS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
+          <Select<DocType> label="Jenis dokumen" value={manualType} onChange={setManualType} options={DOC_TYPE_OPTIONS} />
           <textarea
             value={manualText}
             onChange={(e) => setManualText(e.target.value)}

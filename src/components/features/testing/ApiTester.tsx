@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { apiFetch } from "@/lib/api";
+import { Select } from "@/components/ui/Select";
 
 const endpoints = [
   "/auth/login",
@@ -37,16 +38,13 @@ export default function ApiTester() {
   return (
     <div className="lux-card p-4 space-y-3">
       <div className="flex gap-2">
-        <select
-          className="rounded-lg border border-borderGold bg-surface2 px-2 py-2 text-sm"
+        <Select
+          label="Metode"
+          className="w-28"
           value={method}
-          onChange={(event) => setMethod(event.target.value)}
-        >
-          <option>GET</option>
-          <option>POST</option>
-          <option>PATCH</option>
-          <option>DELETE</option>
-        </select>
+          onChange={setMethod}
+          options={["GET", "POST", "PATCH", "DELETE"].map((m) => ({ value: m, label: m }))}
+        />
         <input
           className="flex-1 rounded-lg border border-borderGold bg-surface2 px-3 py-2 text-sm"
           list="endpoint-list"

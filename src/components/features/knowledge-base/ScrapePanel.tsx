@@ -8,6 +8,7 @@ import { apiFetch } from "@/lib/api";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { Database, Download, Cpu, RefreshCw, Terminal, Upload, Square } from "lucide-react";
 import type { ScrapeSource, ScrapeLogLine, ScrapeCounts } from "@/types";
+import { Checkbox } from "@/components/ui/Checkbox";
 
 type JobStatus = "RUNNING" | "DONE" | "FAILED" | "CANCELLED" | null;
 type JobPhase = "CATALOG" | "PROCESS" | "EMBED" | null;
@@ -199,18 +200,12 @@ export default function ScrapePanel({ onChanged }: { onChanged?: () => void }) {
     <div className="space-y-5">
       {/* ── Control bar ──────────────────────────────────────────── */}
       <div className="bg-surface-1 border border-neutral-200 rounded-xl p-4 flex flex-wrap items-center gap-4">
-        <label className="flex items-center gap-2 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={embedImmediately}
-            onChange={(e) => setEmbedImmediately(e.target.checked)}
-            className="accent-gold w-4 h-4"
-          />
-          <span className="text-text-high text-sm">
-            Embed otomatis setelah scrape
-            <span className="text-text-low text-xs ml-1">(default mati — embedding sering bermasalah)</span>
-          </span>
-        </label>
+        <Checkbox
+          checked={embedImmediately}
+          onChange={setEmbedImmediately}
+          label="Langsung siapkan untuk AI setelah diambil"
+          description="Bawaan mati, karena proses ini sering gagal dan bisa diulang nanti"
+        />
 
         <div className="flex items-center gap-2 ml-auto">
           <span className="text-text-med text-xs" title="Berapa dokumen yang diunduh per klik 'Proses'. Tidak membatasi 'Katalog Penuh'.">Batas unduh/Proses</span>

@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { AlertTriangle, Check, Save } from "lucide-react";
 import { apiFetch } from "@/lib/api";
 import { PageLoader, LoadingSpinner } from "@/components/ui/LoadingSpinner";
+import { Checkbox } from "@/components/ui/Checkbox";
 
 type PricingConfig = {
   taxRate: number | string;
@@ -103,23 +104,12 @@ export default function SettingsPage() {
 
       <div className="bg-surface-1 border border-neutral-200 rounded-xl p-6 flex flex-col gap-6">
         {/* Pajak aktif */}
-        <label className="flex items-center gap-3 cursor-pointer group">
-          <div className="relative flex items-center">
-            <input
-              type="checkbox"
-              checked={taxEnabled}
-              onChange={(e) => setTaxEnabled(e.target.checked)}
-              className="peer shrink-0 w-5 h-5 border-2 border-neutral-300 rounded focus:outline-none focus:ring-2 focus:ring-gold/20 bg-transparent checked:bg-gold checked:border-gold appearance-none transition-colors"
-            />
-            <svg className="absolute left-[3px] top-[3px] w-3.5 h-3.5 text-surface-1 pointer-events-none opacity-0 peer-checked:opacity-100" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-text-high group-hover:text-gold transition-colors">Pajak Aktif</span>
-            <span className="text-xs text-text-low">Matikan untuk tidak membebankan pajak sama sekali</span>
-          </div>
-        </label>
+        <Checkbox
+          checked={taxEnabled}
+          onChange={setTaxEnabled}
+          label="Pajak aktif"
+          description="Matikan untuk tidak membebankan pajak sama sekali"
+        />
 
         {/* Keuntungan */}
         <div className="flex flex-col gap-1.5">

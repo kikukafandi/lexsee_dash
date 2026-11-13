@@ -2,7 +2,7 @@
 
 // Login page — entry point for the Admin Console.
 // Only users with role ADMIN can proceed past login.
-// On mount: if a token already exists, skip login and go to /overview.
+// On mount: if a token already exists, skip login and go to /inbox.
 
 import { useState, useEffect } from "react";
 import { AlertTriangle } from "lucide-react";
@@ -39,7 +39,7 @@ export function LoginForm() {
       // menerbitkan cookie sama sekali.
       await login(email, password);
 
-      router.push("/overview");
+      router.push("/inbox");
       // Layout dashboard adalah server component: tanpa refresh, navigasi bisa
       // memakai hasil render sebelum cookie ada.
       router.refresh();

@@ -20,6 +20,7 @@ import { Sparkline } from "@/components/ui/Sparkline";
 import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 import { OnlineUsersCard } from "@/components/features/overview/OnlineUsersCard";
 import type { KbStats, Payment, MembershipPlan, AdminUsersResponse } from "@/types";
+import { pesanGalat } from "@/lib/labels";
 
 // ─── Helper: get time-of-day greeting ──────────────────────────────────────
 
@@ -96,6 +97,8 @@ export default function OverviewPage() {
   const [plans, setPlans] = useState<MembershipPlan[]>([]);
   const [userStats, setUserStats] = useState<AdminUsersResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  // Waktu acuan diambil sekali saat halaman dibuka (render harus murni).
+  const [sekarang] = useState(() => Date.now());
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -113,7 +116,7 @@ export default function OverviewPage() {
         setPlans(Array.isArray(plansData) ? plansData : []);
         setUserStats(usersData);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : "Gagal memuat data.");
+        setError(pesanGalat(err, "memuat ringkasan"));
       } finally {
         setLoading(false);
       }
@@ -138,6 +141,15 @@ export default function OverviewPage() {
   const totalRevenue = payments
     .filter((p) => p.status === "SUCCESS")
     .reduce((sum, p) => sum + Number(p.amount), 0);
+
+  // Ringkasan bisnis untuk kartu atas, dari data yang sudah dimuat.
+  const awalBulan = new Date(new Date(sekarang).getFullYear(), new Date(sekarang).getMonth(), 1);
+  const pendapatanBulanIni = payments
+    .filter((p) => p.status === "SUCCESS" && new Date(p.createdAt) >= awalBulan)
+    .reduce((sum, p) => sum + Number(p.amount), 0);
+  const tigaPuluhHari = sekarang - 30 * 86_400_000;
+  const penggunaBaru = (userStats?.users ?? []).filter((u) => new Date(u.createdAt).getTime() >= tigaPuluhHari).length;
+  const memberAktif = (userStats?.users ?? []).filter((u) => u.membershipTier !== "FREE").length;
 
   if (loading) {
     return (
@@ -164,13 +176,8 @@ export default function OverviewPage() {
             {getGreeting()}, Admin.
           </h1>
           <p className="text-text-med text-sm mt-1">
-            Selamat datang di Lexsee Admin Console.
+            Ringkasan bisnis Lexsee. Pekerjaan yang menunggu ada di Perlu Ditindak.
           </p>
-        </div>
-        {/* System status indicator */}
-        <div className="flex items-center gap-2 text-xs text-text-med bg-surface-2 px-3 py-1.5 rounded-full border border-neutral-200">
-          <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
-          Sistem normal
         </div>
       </div>
 
@@ -184,31 +191,24 @@ export default function OverviewPage() {
       {/* ── KPI Cards row ─────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <KpiCard
-          label="Dokumen AI Aktif"
-          value={stats?.documents.active ?? 0}
-          subtext={`${stats?.documents.total ?? 0} total dokumen`}
-          sparkData={[3, 5, 4, 8, 6, 10, stats?.documents.active ?? 0]}
+          label="Pendapatan"
+          value={`Rp ${totalRevenue.toLocaleString("id-ID")}`}
+          subtext={`Rp ${pendapatanBulanIni.toLocaleString("id-ID")} bulan ini`}
         />
         <KpiCard
-          label="Sesi Konsultasi"
-          value={stats?.sessions ?? 0}
-          subtext="Total sesi chat AI"
-          sparkData={[10, 15, 12, 20, 18, 25, stats?.sessions ?? 0]}
-          accentColor="#D6324A"
+          label="Pengguna"
+          value={userStats?.summary.total ?? 0}
+          subtext={`${penggunaBaru} baru dalam 30 hari`}
         />
         <KpiCard
-          label="Vector Embedding"
-          value={stats?.chunks ?? 0}
-          subtext="Chunks di knowledge base"
-          sparkData={[50, 80, 120, 160, 200, stats?.chunks ?? 0]}
-          accentColor="#9E0F22"
+          label="Member aktif"
+          value={memberAktif}
+          subtext="Silver, Gold, dan Platinum"
         />
         <KpiCard
-          label="Tingkat Kepuasan AI"
+          label="Kepuasan jawaban AI"
           value={`${helpfulRate}%`}
-          subtext={`${stats?.feedback.helpful ?? 0} positif · ${stats?.feedback.notHelpful ?? 0} negatif`}
-          sparkData={[60, 65, 70, 75, helpfulRate]}
-          accentColor={helpfulRate >= 70 ? "#43A047" : "#F59E0B"}
+          subtext={`${stats?.feedback.helpful ?? 0} membantu · ${stats?.feedback.notHelpful ?? 0} kurang tepat`}
         />
       </div>
 

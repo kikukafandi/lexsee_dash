@@ -93,7 +93,7 @@ export function UserPanel({ user, onClose, onSaved }: Props) {
       title: "Ubah peran pengguna",
       confirmLabel: "Ubah peran",
       aksi: "mengubah peran",
-      message: `Peran ${user.name} akan diubah dari ${label("role", user.role)} menjadi ${label("role", peran)}.`,
+      message: `Peran ${user.name} akan diubah dari ${label("role", user.role)} menjadi ${label("role", peran)}. Berlaku setelah ${user.name} login ulang.`,
       onConfirm: () => kirim({ role: peran }, "Peran diubah."),
     });
   }
@@ -146,6 +146,9 @@ export function UserPanel({ user, onClose, onSaved }: Props) {
             </p>
           ) : (
             <>
+              <p className="text-xs text-text-low">
+                Peran baru berlaku setelah pengguna keluar lalu masuk lagi di aplikasi.
+              </p>
               <Select<string>
                 label="Peran"
                 value={peran}
